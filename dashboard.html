@@ -243,14 +243,42 @@ a { color: var(--accent); text-decoration: none; }
 .overlay-toggles label { font-size: 0.75rem; color: var(--text2); display: flex; align-items: center; gap: 4px; cursor: pointer; }
 #fs-chart-container { flex: 1; width: 100%; min-height: 0; }
 
+/* ── TRAP BUTTON ── */
+.swap-and-trap { display: flex; gap: var(--gap); align-items: flex-start; }
+.swap-and-trap > :first-child { flex: 1; min-width: 0; }
+.trap-btn {
+  flex-shrink: 0; width: 280px;
+  padding: 40px 24px;
+  background: linear-gradient(135deg, #1a0000 0%, #330000 40%, #1a0000 100%);
+  border: 3px solid #f85149;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: inherit; font-size: 2rem; font-weight: 900;
+  color: #ff2222;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 20px rgba(255,34,34,0.6), 0 0 40px rgba(255,34,34,0.3);
+  box-shadow: 0 0 30px rgba(255,34,34,0.2), inset 0 0 30px rgba(255,34,34,0.05);
+  animation: trapPulse 1.5s ease-in-out infinite;
+  transition: transform 0.2s, box-shadow 0.2s;
+  line-height: 1.2; text-align: center;
+}
+.trap-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 50px rgba(255,34,34,0.4), inset 0 0 30px rgba(255,34,34,0.1);
+  border-color: #ff4444;
+}
+.trap-btn:active { transform: scale(0.97); }
+@keyframes trapPulse {
+  0%,100% { text-shadow: 0 0 20px rgba(255,34,34,0.6), 0 0 40px rgba(255,34,34,0.3); }
+  50% { text-shadow: 0 0 30px rgba(255,34,34,0.9), 0 0 60px rgba(255,34,34,0.5), 0 0 80px rgba(255,34,34,0.2); }
+}
+
 /* ── NEWS FEED ── */
-.news-section { display: flex; gap: var(--gap); }
-.news-section > :first-child { flex: 1; min-width: 0; }
 .news-feed {
-  width: 340px; flex-shrink: 0;
   background: var(--card); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 16px;
-  max-height: 520px; overflow-y: auto;
+  max-height: 400px; overflow-y: auto;
 }
 .news-feed::-webkit-scrollbar { width: 4px; }
 .news-feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -291,8 +319,8 @@ a { color: var(--accent); text-decoration: none; }
 /* ── RESPONSIVE ── */
 @media(max-width:1024px) {
   .gl-grid { grid-template-columns: 1fr; }
-  .news-section { flex-direction: column; }
-  .news-feed { width: 100%; max-height: 300px; }
+  .swap-and-trap { flex-direction: column; }
+  .trap-btn { width: 100%; padding: 24px; font-size: 1.5rem; }
 }
 @media(max-width:768px) {
   #coins-table { min-width: 500px; }
@@ -327,8 +355,8 @@ a { color: var(--accent); text-decoration: none; }
 <!-- DASHBOARD -->
 <div class="dashboard">
 
-  <!-- SWAP + NEWS -->
-  <section class="news-section">
+  <!-- SWAP + TRAP BUTTON -->
+  <section class="swap-and-trap">
     <div>
       <h2 class="section-title">Swap</h2>
       <div class="card swap-card">
@@ -348,10 +376,7 @@ a { color: var(--accent); text-decoration: none; }
         <div class="swap-note">Rates from Yahoo Finance. Actual swap execution requires DEX integration.</div>
       </div>
     </div>
-    <div class="news-feed" id="news-feed">
-      <div class="news-feed-title">Market News</div>
-      <div class="news-loading" id="news-loading">Loading news...</div>
-    </div>
+    <button class="trap-btn" id="trap-btn">DO NOT<br>CLICK!!!!!!</button>
   </section>
 
   <!-- TOP 20 TABLE -->
@@ -410,6 +435,14 @@ a { color: var(--accent); text-decoration: none; }
       <div class="hidden" id="metals-panel">
         <div class="metals-grid" id="metals-grid"></div>
       </div>
+    </div>
+  </section>
+
+  <!-- NEWS FEED -->
+  <section>
+    <h2 class="section-title">Market News</h2>
+    <div class="news-feed" id="news-feed">
+      <div class="news-loading" id="news-loading">Loading news...</div>
     </div>
   </section>
 
@@ -580,6 +613,13 @@ const Theme = (() => {
 
   return { isDark, chartColors };
 })();
+
+// ═══════════════════════════════════════════════════
+// TRAP BUTTON
+// ═══════════════════════════════════════════════════
+document.getElementById('trap-btn').onclick = () => {
+  window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+};
 
 // ═══════════════════════════════════════════════════
 // API SERVICE (Yahoo Finance only — no throttling)
