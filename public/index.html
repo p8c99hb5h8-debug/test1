@@ -340,7 +340,7 @@ a { color: var(--accent); text-decoration: none; }
 // CONFIG
 // ═══════════════════════════════════════════════════
 const Config = (() => {
-  const YAHOO = 'https://query1.finance.yahoo.com/v8/finance/chart';
+  const YAHOO = '/api/yahoo';
   const REFRESH = 60000;
 
   const TICKER_ITEMS = [
@@ -413,8 +413,7 @@ const API = (() => {
     const url = `${Config.YAHOO}/${symbol}?interval=1d&range=1d`;
     const c = cache.get(url);
     if (c && Date.now()-c.t < TTL) return c.d;
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
-    const res = await fetch(proxyUrl);
+    const res = await fetch(url);
     if (!res.ok) throw new Error(`Yahoo ${res.status}`);
     const json = await res.json();
     const result = json.chart.result[0];
@@ -435,8 +434,7 @@ const API = (() => {
     const url = `${Config.YAHOO}/${symbol}?range=${range}&interval=${interval}`;
     const c = cache.get('yc:'+url);
     if (c && Date.now()-c.t < TTL) return c.d;
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
-    const res = await fetch(proxyUrl);
+    const res = await fetch(url);
     if (!res.ok) throw new Error(`Yahoo ${res.status}`);
     const json = await res.json();
     const result = json.chart.result[0];
