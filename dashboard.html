@@ -97,7 +97,7 @@ a { color: var(--accent); text-decoration: none; }
   padding: 16px var(--gap);
 }
 .site-logo { display: flex; align-items: center; gap: 10px; }
-.site-logo img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+.site-logo img { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; }
 .site-logo h1 { font-size: 1.3rem; font-weight: 700; }
 .header-controls { display: flex; align-items: center; gap: 10px; margin-left: auto; }
 .theme-toggle {
@@ -243,6 +243,42 @@ a { color: var(--accent); text-decoration: none; }
 .overlay-toggles label { font-size: 0.75rem; color: var(--text2); display: flex; align-items: center; gap: 4px; cursor: pointer; }
 #fs-chart-container { flex: 1; width: 100%; min-height: 0; }
 
+/* ── NEWS FEED ── */
+.news-section { display: flex; gap: var(--gap); }
+.news-section > :first-child { flex: 1; min-width: 0; }
+.news-feed {
+  width: 340px; flex-shrink: 0;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+  max-height: 520px; overflow-y: auto;
+}
+.news-feed::-webkit-scrollbar { width: 4px; }
+.news-feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.news-feed-title {
+  font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text2); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+}
+.news-feed-title::before { content: '📰'; font-size: 1rem; }
+.news-item {
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  transition: opacity 0.2s;
+}
+.news-item:last-child { border-bottom: none; }
+.news-item:hover { opacity: 0.8; }
+.news-item a {
+  color: var(--text); text-decoration: none;
+  font-size: 0.82rem; font-weight: 500; line-height: 1.4;
+  display: block;
+}
+.news-item a:hover { color: var(--accent); }
+.news-meta {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 4px; font-size: 0.7rem; color: var(--text3);
+}
+.news-source { color: var(--text2); font-weight: 600; }
+.news-loading { color: var(--text3); font-size: 0.8rem; padding: 20px 0; text-align: center; }
+
 /* ── STATUS BAR ── */
 #status-bar { text-align: center; padding: 12px; font-size: 0.75rem; color: var(--text3); }
 .dot, .dot-error, .dot-loading { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
@@ -253,7 +289,11 @@ a { color: var(--accent); text-decoration: none; }
 .loading-text { color: var(--text3); font-size: 0.85rem; padding: 40px; text-align: center; }
 
 /* ── RESPONSIVE ── */
-@media(max-width:1024px) { .gl-grid { grid-template-columns: 1fr; } }
+@media(max-width:1024px) {
+  .gl-grid { grid-template-columns: 1fr; }
+  .news-section { flex-direction: column; }
+  .news-feed { width: 100%; max-height: 300px; }
+}
 @media(max-width:768px) {
   #coins-table { min-width: 500px; }
   .chart-topbar { flex-wrap: wrap; gap: 10px; padding: 10px 12px; }
@@ -287,24 +327,30 @@ a { color: var(--accent); text-decoration: none; }
 <!-- DASHBOARD -->
 <div class="dashboard">
 
-  <!-- SWAP -->
-  <section>
-    <h2 class="section-title">Swap</h2>
-    <div class="card swap-card">
-      <div class="swap-row">
-        <span class="swap-label">From</span>
-        <select class="swap-select" id="swap-from"></select>
-        <input class="swap-input" id="swap-amount" type="number" placeholder="0.00" min="0" step="any">
+  <!-- SWAP + NEWS -->
+  <section class="news-section">
+    <div>
+      <h2 class="section-title">Swap</h2>
+      <div class="card swap-card">
+        <div class="swap-row">
+          <span class="swap-label">From</span>
+          <select class="swap-select" id="swap-from"></select>
+          <input class="swap-input" id="swap-amount" type="number" placeholder="0.00" min="0" step="any">
+        </div>
+        <button class="swap-flip" id="swap-flip" title="Swap direction">&#8597;</button>
+        <div class="swap-row">
+          <span class="swap-label">To</span>
+          <select class="swap-select" id="swap-to"></select>
+          <input class="swap-input" id="swap-output" type="text" readonly placeholder="0.00">
+        </div>
+        <div class="swap-rate" id="swap-rate">Select tokens to see rate</div>
+        <button class="swap-action" id="swap-btn" disabled>Connect Wallet to Swap</button>
+        <div class="swap-note">Rates from Yahoo Finance. Actual swap execution requires DEX integration.</div>
       </div>
-      <button class="swap-flip" id="swap-flip" title="Swap direction">&#8597;</button>
-      <div class="swap-row">
-        <span class="swap-label">To</span>
-        <select class="swap-select" id="swap-to"></select>
-        <input class="swap-input" id="swap-output" type="text" readonly placeholder="0.00">
-      </div>
-      <div class="swap-rate" id="swap-rate">Select tokens to see rate</div>
-      <button class="swap-action" id="swap-btn" disabled>Connect Wallet to Swap</button>
-      <div class="swap-note">Rates from Yahoo Finance. Actual swap execution requires DEX integration.</div>
+    </div>
+    <div class="news-feed" id="news-feed">
+      <div class="news-feed-title">Market News</div>
+      <div class="news-loading" id="news-loading">Loading news...</div>
     </div>
   </section>
 
@@ -972,6 +1018,67 @@ const UI = (() => {
 })();
 
 // ═══════════════════════════════════════════════════
+// NEWS FEED
+// ═══════════════════════════════════════════════════
+const News = (() => {
+  const feed = document.getElementById('news-feed');
+  const loading = document.getElementById('news-loading');
+
+  function timeAgo(dateStr) {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return mins + 'm ago';
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + 'h ago';
+    return Math.floor(hrs / 24) + 'd ago';
+  }
+
+  function render(items) {
+    if (loading) loading.remove();
+    const existing = feed.querySelectorAll('.news-item');
+    existing.forEach(el => el.remove());
+    items.slice(0, 15).forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'news-item';
+      const source = item.source || '';
+      div.innerHTML = `<a href="${item.link}" target="_blank" rel="noopener">${item.title}</a><div class="news-meta"><span class="news-source">${source}</span><span>${item.timeAgo}</span></div>`;
+      feed.appendChild(div);
+    });
+  }
+
+  async function fetchNews() {
+    try {
+      const newsUrl = Config.isLocal
+        ? 'https://corsproxy.io/?url=' + encodeURIComponent('https://news.google.com/rss/search?q=stock+market+OR+cryptocurrency+OR+federal+reserve+OR+wall+street&hl=en-US&gl=US&ceid=US:en')
+        : '/api/news';
+      const resp = await fetch(newsUrl);
+      const text = await resp.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(text, 'text/xml');
+      const items = [...xml.querySelectorAll('item')].map(item => {
+        const title = item.querySelector('title')?.textContent || '';
+        const link = item.querySelector('link')?.textContent || '#';
+        const pubDate = item.querySelector('pubDate')?.textContent || '';
+        const sourceEl = item.querySelector('source');
+        const source = sourceEl ? sourceEl.textContent : '';
+        return { title, link, source, timeAgo: timeAgo(pubDate) };
+      });
+      render(items);
+    } catch (e) {
+      if (loading) loading.textContent = 'Unable to load news';
+      console.warn('News fetch error:', e);
+    }
+  }
+
+  function init() {
+    fetchNews();
+    setInterval(fetchNews, 5 * 60 * 1000);
+  }
+
+  return { init };
+})();
+
+// ═══════════════════════════════════════════════════
 // APP
 // ═══════════════════════════════════════════════════
 const App = (() => {
@@ -1034,7 +1141,7 @@ const App = (() => {
   return { init, findCoin, getYahoo };
 })();
 
-document.addEventListener('DOMContentLoaded', App.init);
+document.addEventListener('DOMContentLoaded', () => { App.init(); News.init(); });
 </script>
 </body>
 </html>
