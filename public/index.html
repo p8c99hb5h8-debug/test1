@@ -53,10 +53,8 @@ a { color: var(--accent); text-decoration: none; }
   white-space: nowrap; font-size: 0.85rem;
 }
 .ticker-name { color: var(--text2); font-weight: 600; }
-.ticker-spark { width: 60px; height: 24px; }
 .ticker-price { font-weight: 600; }
 .ticker-change { font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; }
-.ticker-market-note { font-size: 0.65rem; color: var(--text3); }
 
 /* ── DASHBOARD ── */
 .dashboard {
@@ -79,20 +77,6 @@ a { color: var(--accent); text-decoration: none; }
 .clickable { cursor: pointer; }
 .clickable:hover { border-color: var(--border-hover); background: var(--card-hover); }
 
-/* ── OVERVIEW ── */
-.overview-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--gap); }
-.card-label { font-size: 0.75rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-.card-value { font-size: 1.5rem; font-weight: 700; }
-.card-change { font-size: 0.85rem; margin-top: 4px; }
-
-/* ── RATIO ── */
-.ratio-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: var(--gap); }
-.ratio-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.ratio-label { font-size: 0.85rem; color: var(--text2); font-weight: 600; }
-.ratio-value { font-size: 1.1rem; font-weight: 700; }
-.ratio-chart-mini { height: 150px; margin-top: 8px; }
-.ratio-note { font-size: 0.7rem; color: var(--text3); margin-top: 6px; }
-
 /* ── TABLE ── */
 .table-wrapper { overflow-x: auto; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); }
 #coins-table { width: 100%; border-collapse: collapse; }
@@ -113,9 +97,7 @@ a { color: var(--accent); text-decoration: none; }
 #coins-table tbody tr { cursor: pointer; transition: background 0.15s; }
 #coins-table tbody tr:hover { background: var(--card-hover); }
 .coin-info { display: flex; align-items: center; gap: 8px; }
-.coin-icon { width: 24px; height: 24px; border-radius: 50%; }
 .coin-symbol { color: var(--text2); font-size: 0.75rem; margin-left: 4px; }
-.spark-7d { width: 100px; height: 32px; }
 .gain { color: var(--gain); }
 .loss { color: var(--loss); }
 
@@ -128,7 +110,6 @@ a { color: var(--accent); text-decoration: none; }
 }
 .gl-title { font-weight: 700; font-size: 0.95rem; }
 .gl-toggle { font-size: 0.75rem; color: var(--accent); }
-.gl-preview, .gl-list { padding: 0; }
 .gl-item {
   display: flex; justify-content: space-between; align-items: center;
   padding: 10px 20px; border-bottom: 1px solid var(--border);
@@ -227,21 +208,13 @@ a { color: var(--accent); text-decoration: none; }
 
 /* ── LOADING ── */
 .loading-text { color: var(--text3); font-size: 0.85rem; padding: 40px; text-align: center; }
-.skeleton {
-  background: linear-gradient(90deg, var(--border) 25%, var(--card-hover) 50%, var(--border) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 4px;
-}
-@keyframes shimmer { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
 
 /* ── RESPONSIVE ── */
 @media(max-width:1024px) {
-  .ratio-grid, .gl-grid { grid-template-columns: 1fr; }
+  .gl-grid { grid-template-columns: 1fr; }
 }
 @media(max-width:768px) {
-  .overview-grid { grid-template-columns: 1fr; }
-  #coins-table { min-width: 800px; }
+  #coins-table { min-width: 500px; }
   .chart-topbar { flex-wrap: wrap; gap: 10px; padding: 10px 12px; }
   .chart-controls { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
 }
@@ -259,68 +232,22 @@ a { color: var(--accent); text-decoration: none; }
 <!-- DASHBOARD -->
 <div class="dashboard">
 
-  <!-- OVERVIEW CARDS -->
+  <!-- TOP 20 TABLE -->
   <section>
-    <div class="overview-grid">
-      <div class="card" id="card-btc-dom">
-        <div class="card-label">Bitcoin Dominance</div>
-        <div class="card-value">--</div>
-        <div class="card-change">--</div>
-      </div>
-      <div class="card" id="card-total-mcap">
-        <div class="card-label">Total Market Cap</div>
-        <div class="card-value">--</div>
-        <div class="card-change">--</div>
-      </div>
-      <div class="card" id="card-total3">
-        <div class="card-label">Total 3 (excl BTC &amp; ETH)</div>
-        <div class="card-value">--</div>
-        <div class="card-change">--</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RATIO CHARTS -->
-  <section>
-    <h2 class="section-title">Ratio Charts</h2>
-    <div class="ratio-grid">
-      <div class="card clickable" data-ratio="btc-gold">
-        <div class="ratio-header">
-          <span class="ratio-label">BTC / Gold</span>
-          <span class="ratio-value" id="ratio-btc-gold">--</span>
-        </div>
-        <div class="ratio-chart-mini" id="ratio-btc-gold-chart"></div>
-      </div>
-      <div class="card clickable" data-ratio="btc-m2">
-        <div class="ratio-header">
-          <span class="ratio-label">BTC / M2 Money Supply</span>
-          <span class="ratio-value" id="ratio-btc-m2">--</span>
-        </div>
-        <div class="ratio-chart-mini" id="ratio-btc-m2-chart"></div>
-        <div class="ratio-note">M2 ~$21.7T (updated monthly via FRED)</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TOP 50 TABLE -->
-  <section>
-    <h2 class="section-title">Top 50 Cryptocurrencies</h2>
+    <h2 class="section-title">Top 20 Cryptocurrencies</h2>
     <div class="table-wrapper">
       <table id="coins-table">
         <thead>
           <tr>
-            <th data-sort="market_cap_rank"># <span class="sort-arrow"></span></th>
+            <th data-sort="rank"># <span class="sort-arrow"></span></th>
             <th data-sort="name">Name <span class="sort-arrow"></span></th>
-            <th data-sort="current_price">Price <span class="sort-arrow"></span></th>
-            <th data-sort="price_change_percentage_24h_in_currency">24h % <span class="sort-arrow"></span></th>
-            <th data-sort="price_change_percentage_7d_in_currency">7d % <span class="sort-arrow"></span></th>
-            <th data-sort="market_cap">Market Cap <span class="sort-arrow"></span></th>
-            <th data-sort="total_volume">Volume (24h) <span class="sort-arrow"></span></th>
-            <th>7d Chart</th>
+            <th data-sort="price">Price <span class="sort-arrow"></span></th>
+            <th data-sort="change">24h % <span class="sort-arrow"></span></th>
+            <th data-sort="volume">Volume (24h) <span class="sort-arrow"></span></th>
           </tr>
         </thead>
         <tbody id="coins-tbody">
-          <tr><td colspan="8" class="loading-text">Loading market data...</td></tr>
+          <tr><td colspan="5" class="loading-text">Loading market data...</td></tr>
         </tbody>
       </table>
     </div>
@@ -413,23 +340,45 @@ a { color: var(--accent); text-decoration: none; }
 // CONFIG
 // ═══════════════════════════════════════════════════
 const Config = (() => {
-  const BASE = 'https://api.coingecko.com/api/v3';
   const YAHOO = 'https://query1.finance.yahoo.com/v8/finance/chart';
   const REFRESH = 60000;
-  const M2 = 21.7e12;
 
-  // Yahoo Finance symbols for ticker & metals
   const TICKER_ITEMS = [
     { symbol:'%5EGSPC', label:'SPX', name:'S&P 500' },
     { symbol:'%5EIXIC', label:'NDX', name:'NASDAQ' },
     { symbol:'GC%3DF', label:'GOLD', name:'Gold' },
+    { symbol:'BTC-USD', label:'BTC', name:'Bitcoin' },
   ];
+
   const METALS_LIST = [
     { symbol:'GC%3DF', name:'Gold Futures', unit:'/oz' },
     { symbol:'SI%3DF', name:'Silver Futures', unit:'/oz' },
     { symbol:'PL%3DF', name:'Platinum Futures', unit:'/oz' },
     { symbol:'PA%3DF', name:'Palladium Futures', unit:'/oz' },
     { symbol:'HG%3DF', name:'Copper Futures', unit:'/lb' },
+  ];
+
+  const CRYPTO_LIST = [
+    { symbol:'BTC-USD', name:'Bitcoin', short:'BTC' },
+    { symbol:'ETH-USD', name:'Ethereum', short:'ETH' },
+    { symbol:'XRP-USD', name:'XRP', short:'XRP' },
+    { symbol:'BNB-USD', name:'BNB', short:'BNB' },
+    { symbol:'SOL-USD', name:'Solana', short:'SOL' },
+    { symbol:'DOGE-USD', name:'Dogecoin', short:'DOGE' },
+    { symbol:'ADA-USD', name:'Cardano', short:'ADA' },
+    { symbol:'TRX-USD', name:'TRON', short:'TRX' },
+    { symbol:'LINK-USD', name:'Chainlink', short:'LINK' },
+    { symbol:'AVAX-USD', name:'Avalanche', short:'AVAX' },
+    { symbol:'XLM-USD', name:'Stellar', short:'XLM' },
+    { symbol:'SHIB-USD', name:'Shiba Inu', short:'SHIB' },
+    { symbol:'DOT-USD', name:'Polkadot', short:'DOT' },
+    { symbol:'BCH-USD', name:'Bitcoin Cash', short:'BCH' },
+    { symbol:'LTC-USD', name:'Litecoin', short:'LTC' },
+    { symbol:'HBAR-USD', name:'Hedera', short:'HBAR' },
+    { symbol:'UNI7083-USD', name:'Uniswap', short:'UNI' },
+    { symbol:'NEAR-USD', name:'NEAR Protocol', short:'NEAR' },
+    { symbol:'ATOM-USD', name:'Cosmos', short:'ATOM' },
+    { symbol:'PEPE24478-USD', name:'Pepe', short:'PEPE' },
   ];
 
   function fmtUSD(n, dec) {
@@ -450,30 +399,15 @@ const Config = (() => {
   }
   function cls(n) { return n >= 0 ? 'gain' : 'loss'; }
 
-  return { BASE, YAHOO, REFRESH, M2, TICKER_ITEMS, METALS_LIST, fmtUSD, fmtLarge, fmtPct, cls };
+  return { YAHOO, REFRESH, TICKER_ITEMS, METALS_LIST, CRYPTO_LIST, fmtUSD, fmtLarge, fmtPct, cls };
 })();
 
 // ═══════════════════════════════════════════════════
-// API SERVICE
+// API SERVICE (Yahoo Finance only — no throttling)
 // ═══════════════════════════════════════════════════
 const API = (() => {
   const cache = new Map();
   const TTL = 55000;
-  let lastCall = 0;
-
-  async function get(url) {
-    const c = cache.get(url);
-    if (c && Date.now()-c.t < TTL) return c.d;
-    const wait = Math.max(0, 1500-(Date.now()-lastCall));
-    if (wait) await new Promise(r=>setTimeout(r,wait));
-    lastCall = Date.now();
-    const res = await fetch(url);
-    if (res.status === 429) { await new Promise(r=>setTimeout(r,30000)); return get(url); }
-    if (!res.ok) throw new Error(`${res.status}`);
-    const d = await res.json();
-    cache.set(url, {d, t:Date.now()});
-    return d;
-  }
 
   async function yahoo(symbol) {
     const url = `${Config.YAHOO}/${symbol}?interval=1d&range=1d`;
@@ -483,11 +417,14 @@ const API = (() => {
     const res = await fetch(proxyUrl);
     if (!res.ok) throw new Error(`Yahoo ${res.status}`);
     const json = await res.json();
-    const meta = json.chart.result[0].meta;
+    const result = json.chart.result[0];
+    const meta = result.meta;
     const price = meta.regularMarketPrice;
     const prev = meta.chartPreviousClose || meta.previousClose;
     const change = prev ? ((price - prev) / prev) * 100 : 0;
-    const d = { price, prevClose: prev, change, name: meta.longName || meta.shortName || symbol };
+    const q = result.indicators?.quote?.[0];
+    const volume = q?.volume?.[q.volume.length-1] || meta.regularMarketVolume || 0;
+    const d = { price, prevClose: prev, change, volume, name: meta.longName || meta.shortName || symbol };
     cache.set(url, {d, t:Date.now()});
     return d;
   }
@@ -506,51 +443,13 @@ const API = (() => {
     const timestamps = result.timestamp || [];
     const q = result.indicators.quote[0];
     const d = timestamps.map((t, i) => ({
-      time: t,
-      open: q.open[i],
-      high: q.high[i],
-      low: q.low[i],
-      close: q.close[i],
-      volume: q.volume[i],
+      time: t, open: q.open[i], high: q.high[i], low: q.low[i], close: q.close[i], volume: q.volume[i],
     })).filter(r => r.close != null);
     cache.set('yc:'+url, {d, t:Date.now()});
     return d;
   }
 
-  return {
-    global: () => get(`${Config.BASE}/global`),
-    markets: (n=50) => get(`${Config.BASE}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${n}&page=1&sparkline=true&price_change_percentage=24h%2C7d`),
-    chart: (id,days) => get(`${Config.BASE}/coins/${id}/market_chart?vs_currency=usd&days=${days}`),
-    yahoo,
-    yahooChart,
-  };
-})();
-
-// ═══════════════════════════════════════════════════
-// SPARKLINE (Canvas)
-// ═══════════════════════════════════════════════════
-const Spark = (() => {
-  function draw(canvas, data, color) {
-    if (!data || data.length < 2) return;
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
-    const w = canvas.clientWidth, h = canvas.clientHeight;
-    canvas.width = w*dpr; canvas.height = h*dpr;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    const mn = Math.min(...data), mx = Math.max(...data), rng = mx-mn||1;
-    const step = w/(data.length-1);
-    ctx.clearRect(0,0,w,h);
-    ctx.beginPath();
-    ctx.strokeStyle = color || '#3fb950';
-    ctx.lineWidth = 1.5;
-    ctx.lineJoin = 'round';
-    for (let i=0; i<data.length; i++) {
-      const x = i*step, y = h-((data[i]-mn)/rng)*(h-4)-2;
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-  }
-  return { draw };
+  return { yahoo, yahooChart };
 })();
 
 // ═══════════════════════════════════════════════════
@@ -564,28 +463,6 @@ const Charts = (() => {
     rightPriceScale: { borderColor:'#30363d' },
     crosshair: { mode: 0 },
   };
-  const minis = {};
-
-  function createMini(elId, data) {
-    const el = document.getElementById(elId);
-    if (!el) return;
-    el.innerHTML = '';
-    if (minis[elId]) { minis[elId].remove(); delete minis[elId]; }
-    const chart = LightweightCharts.createChart(el, {
-      ...THEME, width: el.clientWidth, height: 150,
-      handleScroll:false, handleScale:false,
-      timeScale:{...THEME.timeScale, visible:false},
-      rightPriceScale:{visible:false},
-    });
-    const s = chart.addAreaSeries({
-      lineColor:'#58a6ff', topColor:'rgba(88,166,255,0.25)',
-      bottomColor:'rgba(88,166,255,0.02)', lineWidth:2,
-    });
-    s.setData(data);
-    chart.timeScale().fitContent();
-    minis[elId] = chart;
-    new ResizeObserver(e => chart.resize(e[0].contentRect.width, 150)).observe(el);
-  }
 
   function calcMA(data, period) {
     const r = [];
@@ -597,7 +474,7 @@ const Charts = (() => {
     return r;
   }
 
-  return { createMini, calcMA, THEME };
+  return { calcMA, THEME };
 })();
 
 // ═══════════════════════════════════════════════════
@@ -627,7 +504,6 @@ const FullScreenChart = (() => {
       chEl.className = 'chart-asset-change';
     }
 
-    // Reset control states
     document.querySelectorAll('#chart-view [data-chart-type]').forEach(b =>
       b.classList.toggle('active', b.dataset.chartType === 'candlestick'));
     document.querySelectorAll('#chart-view [data-range]').forEach(b =>
@@ -677,12 +553,10 @@ const FullScreenChart = (() => {
           time: d.time, open: d.open, high: d.high, low: d.low, close: d.close
         })));
 
-        // 50 MA
         if (document.getElementById('fs-ma50').checked && data.length >= 50) {
           ma50s = chart.addLineSeries({color:'#e3b341', lineWidth:1, lastValueVisible:false, priceLineVisible:false});
           ma50s.setData(Charts.calcMA(data, 50));
         }
-        // 200 MA
         if (document.getElementById('fs-ma200').checked && data.length >= 200) {
           ma200s = chart.addLineSeries({color:'#a371f7', lineWidth:1, lastValueVisible:false, priceLineVisible:false});
           ma200s.setData(Charts.calcMA(data, 200));
@@ -695,7 +569,6 @@ const FullScreenChart = (() => {
         mainSeries.setData(data.map(d => ({ time: d.time, value: d.close })));
       }
 
-      // Volume
       if (document.getElementById('fs-vol').checked) {
         volSeries = chart.addHistogramSeries({
           priceFormat:{type:'volume'}, priceScaleId:'vol',
@@ -717,7 +590,6 @@ const FullScreenChart = (() => {
     }
   }
 
-  // Bind events
   document.getElementById('chart-back').onclick = close;
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !document.getElementById('chart-view').classList.contains('hidden')) close();
@@ -752,34 +624,24 @@ const FullScreenChart = (() => {
 // UI RENDERERS
 // ═══════════════════════════════════════════════════
 const UI = (() => {
-
-  function overview(global) {
-    const d = global.data;
-    const btcDom = d.market_cap_percentage?.btc;
-    const totalMcap = d.total_market_cap?.usd;
-    const ethDom = d.market_cap_percentage?.eth || 0;
-    const total3 = totalMcap ? totalMcap * (1 - (btcDom+ethDom)/100) : null;
-    const mcapChange = d.market_cap_change_percentage_24h_usd;
-
-    setCard('card-btc-dom', btcDom != null ? btcDom.toFixed(1)+'%' : '--');
-    setCard('card-total-mcap', Config.fmtLarge(totalMcap), mcapChange);
-    setCard('card-total3', Config.fmtLarge(total3));
-  }
-
-  function setCard(id, value, change) {
-    const el = document.getElementById(id);
-    el.querySelector('.card-value').textContent = value;
-    const chEl = el.querySelector('.card-change');
-    if (change != null) {
-      chEl.textContent = Config.fmtPct(change);
-      chEl.className = 'card-change ' + Config.cls(change);
-    } else {
-      chEl.textContent = '';
-    }
-  }
-
-  let sortKey = 'market_cap_rank', sortDir = 'asc';
+  let sortKey = 'rank', sortDir = 'asc';
   let coinsCache = [];
+
+  function ticker(yahooData) {
+    const items = Config.TICKER_ITEMS.map(ti => {
+      const d = yahooData[ti.symbol];
+      return { symbol: ti.label, price: d?.price, change: d?.change };
+    });
+    const html = items.map(it => {
+      const chCls = it.change != null ? Config.cls(it.change) : '';
+      return `<div class="ticker-item">
+        <span class="ticker-name">${it.symbol}</span>
+        <span class="ticker-price">${it.price != null ? Config.fmtUSD(it.price) : '--'}</span>
+        <span class="ticker-change ${chCls}">${it.change!=null?Config.fmtPct(it.change):'--'}</span>
+      </div>`;
+    }).join('');
+    document.getElementById('ticker-track').innerHTML = html + html;
+  }
 
   function table(coins) {
     coinsCache = coins;
@@ -797,36 +659,18 @@ const UI = (() => {
     });
 
     const tbody = document.getElementById('coins-tbody');
-    tbody.innerHTML = coins.map((c,i) => {
-      const ch24 = c.price_change_percentage_24h_in_currency;
-      const ch7d = c.price_change_percentage_7d_in_currency;
-      return `<tr data-id="${c.id}" data-name="${c.name}">
-        <td>${c.market_cap_rank||'-'}</td>
+    tbody.innerHTML = coins.map(c => {
+      return `<tr data-symbol="${c.yahooSymbol}" data-name="${c.name}" data-short="${c.short}">
+        <td>${c.rank}</td>
         <td><div class="coin-info">
-          <img class="coin-icon" src="${c.image}" alt="" loading="lazy">
-          ${c.name}<span class="coin-symbol">${c.symbol.toUpperCase()}</span>
+          ${c.name}<span class="coin-symbol">${c.short}</span>
         </div></td>
-        <td>${Config.fmtUSD(c.current_price)}</td>
-        <td class="${Config.cls(ch24)}">${Config.fmtPct(ch24)}</td>
-        <td class="${Config.cls(ch7d)}">${Config.fmtPct(ch7d)}</td>
-        <td>${Config.fmtLarge(c.market_cap)}</td>
-        <td>${Config.fmtLarge(c.total_volume)}</td>
-        <td><canvas class="spark-7d" data-idx="${i}"></canvas></td>
+        <td>${Config.fmtUSD(c.price)}</td>
+        <td class="${Config.cls(c.change)}">${Config.fmtPct(c.change)}</td>
+        <td>${Config.fmtLarge(c.volume)}</td>
       </tr>`;
     }).join('');
 
-    // Draw sparklines
-    requestAnimationFrame(() => {
-      coins.forEach((c,i) => {
-        const cv = tbody.querySelector(`canvas[data-idx="${i}"]`);
-        if (cv && c.sparkline_in_7d?.price) {
-          const p = c.sparkline_in_7d.price;
-          Spark.draw(cv, p, p[p.length-1] >= p[0] ? '#3fb950' : '#f85149');
-        }
-      });
-    });
-
-    // Update sort arrows
     document.querySelectorAll('#coins-table th[data-sort]').forEach(th => {
       const arrow = th.querySelector('.sort-arrow');
       if (th.dataset.sort === sortKey) {
@@ -838,10 +682,10 @@ const UI = (() => {
   }
 
   function gainersLosers(coins) {
-    const sorted = coins.filter(c => c.price_change_percentage_24h_in_currency != null)
-      .sort((a,b) => b.price_change_percentage_24h_in_currency - a.price_change_percentage_24h_in_currency);
-    const gainers = sorted.slice(0, 20);
-    const losers = sorted.slice(-20).reverse();
+    const sorted = coins.filter(c => c.change != null)
+      .sort((a,b) => b.change - a.change);
+    const gainers = sorted.slice(0, 10);
+    const losers = sorted.slice(-10).reverse();
 
     renderGLList('gainer-preview', [gainers[0]]);
     renderGLList('gainers-list', gainers.slice(1));
@@ -853,54 +697,30 @@ const UI = (() => {
     const el = document.getElementById(elId);
     if (!el || !items) return;
     el.innerHTML = items.filter(Boolean).map(c => {
-      const ch = c.price_change_percentage_24h_in_currency;
-      return `<div class="gl-item" data-id="${c.id}" data-name="${c.name}">
+      return `<div class="gl-item" data-symbol="${c.yahooSymbol}" data-name="${c.name}" data-short="${c.short}">
         <div class="gl-item-name">
-          <img src="${c.image}" width="20" height="20" style="border-radius:50%" loading="lazy">
-          ${c.name} <span style="color:var(--text2);font-size:0.75rem;margin-left:4px">${c.symbol.toUpperCase()}</span>
+          ${c.name} <span style="color:var(--text2);font-size:0.75rem;margin-left:4px">${c.short}</span>
         </div>
-        <div class="gl-item-change ${Config.cls(ch)}">${Config.fmtPct(ch)}</div>
+        <div class="gl-item-change ${Config.cls(c.change)}">${Config.fmtPct(c.change)}</div>
       </div>`;
     }).join('');
   }
 
-  function metals(yahooMetals) {
+  function metals(yahooData) {
     const grid = document.getElementById('metals-grid');
     grid.innerHTML = Config.METALS_LIST.map(m => {
-      const d = yahooMetals[m.symbol];
+      const d = yahooData[m.symbol];
       const price = d?.price;
       const change = d?.change;
       return `<div class="metal-item" data-symbol="${m.symbol}" data-name="${m.name}">
         <div class="metal-name">${m.name}</div>
-        <div class="metal-price">${price != null ? Config.fmtUSD(price) : 'Loading...'}</div>
+        <div class="metal-price">${price != null ? Config.fmtUSD(price) : '--'}</div>
         <div class="metal-change ${change!=null?Config.cls(change):''}">${change!=null?Config.fmtPct(change):''}</div>
       </div>`;
     }).join('');
   }
 
-  function ticker(btcCoin, yahooData) {
-    const items = [];
-    // Add Yahoo-sourced items (SPX, NDX, Gold)
-    Config.TICKER_ITEMS.forEach(ti => {
-      const d = yahooData[ti.symbol];
-      items.push({ symbol: ti.label, price: d?.price, change: d?.change });
-    });
-    // Add BTC from CoinGecko
-    items.push({ symbol:'BTC', price:btcCoin?.current_price, change:btcCoin?.price_change_percentage_24h });
-
-    const html = items.map(it => {
-      const chCls = it.change != null ? Config.cls(it.change) : '';
-      return `<div class="ticker-item">
-        <span class="ticker-name">${it.symbol}</span>
-        <span class="ticker-price">${it.price != null ? Config.fmtUSD(it.price) : '--'}</span>
-        <span class="ticker-change ${chCls}">${it.change!=null?Config.fmtPct(it.change):'--'}</span>
-      </div>`;
-    }).join('');
-
-    document.getElementById('ticker-track').innerHTML = html + html; // duplicate for loop
-  }
-
-  return { overview, table, gainersLosers, metals, ticker, sortKey:()=>sortKey, sortDir:()=>sortDir,
+  return { ticker, table, gainersLosers, metals, sortKey:()=>sortKey, sortDir:()=>sortDir,
     setSort(k,d){ sortKey=k; sortDir=d; renderTableSorted(); }
   };
 })();
@@ -915,20 +735,20 @@ const UI = (() => {
       const key = th.dataset.sort;
       let dir = 'desc';
       if (UI.sortKey() === key) dir = UI.sortDir() === 'asc' ? 'desc' : 'asc';
-      else if (key === 'name' || key === 'market_cap_rank') dir = 'asc';
+      else if (key === 'name' || key === 'rank') dir = 'asc';
       UI.setSort(key, dir);
     };
   });
 
   // Table row clicks
   document.getElementById('coins-tbody').addEventListener('click', e => {
-    const row = e.target.closest('tr[data-id]');
+    const row = e.target.closest('tr[data-symbol]');
     if (row) {
-      const coin = App.findCoin(row.dataset.id);
+      const coin = App.findCoin(row.dataset.symbol);
       if (coin) FullScreenChart.open({
-        yahooSymbol: coin.symbol.toUpperCase() + '-USD',
-        name: coin.name, displaySymbol: coin.symbol.toUpperCase(),
-        price: coin.current_price, change: coin.price_change_percentage_24h,
+        yahooSymbol: coin.yahooSymbol,
+        name: coin.name, displaySymbol: coin.short,
+        price: coin.price, change: coin.change,
       });
     }
   });
@@ -945,13 +765,13 @@ const UI = (() => {
   // GL item clicks
   document.querySelectorAll('#gainer-preview, #gainers-list, #loser-preview, #losers-list').forEach(el => {
     el.addEventListener('click', e => {
-      const item = e.target.closest('.gl-item[data-id]');
+      const item = e.target.closest('.gl-item[data-symbol]');
       if (item) {
-        const coin = App.findCoin(item.dataset.id);
+        const coin = App.findCoin(item.dataset.symbol);
         if (coin) FullScreenChart.open({
-          yahooSymbol: coin.symbol.toUpperCase() + '-USD',
-          name: coin.name, displaySymbol: coin.symbol.toUpperCase(),
-          price: coin.current_price, change: coin.price_change_percentage_24h,
+          yahooSymbol: coin.yahooSymbol,
+          name: coin.name, displaySymbol: coin.short,
+          price: coin.price, change: coin.change,
         });
       }
     });
@@ -976,29 +796,16 @@ const UI = (() => {
       });
     }
   });
-
-  // Ratio card clicks
-  document.querySelectorAll('[data-ratio]').forEach(card => {
-    card.onclick = () => {
-      const btc = App.findCoin('bitcoin');
-      FullScreenChart.open({
-        yahooSymbol: 'BTC-USD',
-        name: card.dataset.ratio === 'btc-gold' ? 'BTC / Gold Ratio' : 'BTC / M2 Supply',
-        displaySymbol: 'BTC',
-        price: btc?.current_price, change: btc?.price_change_percentage_24h,
-      });
-    };
-  });
 })();
 
 // ═══════════════════════════════════════════════════
 // APP
 // ═══════════════════════════════════════════════════
 const App = (() => {
-  let marketsCache = [];
+  let coinsCache = [];
   let yahooCache = {};
 
-  function findCoin(id) { return marketsCache.find(c => c.id === id); }
+  function findCoin(symbol) { return coinsCache.find(c => c.yahooSymbol === symbol); }
   function getYahoo(symbol) { return yahooCache[symbol]; }
 
   function status(msg) {
@@ -1013,90 +820,49 @@ const App = (() => {
   }
 
   async function refresh() {
-    status('Updating...');
-    let done = 0, total = 3; // yahoo, coingecko-markets, coingecko-charts
+    status('Loading...');
 
-    // ── Yahoo (ticker + metals) — fires first, renders immediately ──
-    const allYahooSymbols = [...new Set([
+    // All Yahoo symbols: ticker + metals + crypto — fetch ALL in parallel
+    const allSymbols = [...new Set([
       ...Config.TICKER_ITEMS.map(t=>t.symbol),
       ...Config.METALS_LIST.map(m=>m.symbol),
+      ...Config.CRYPTO_LIST.map(c=>c.symbol),
     ])];
-    const yahooTask = Promise.all(
-      allYahooSymbols.map(s => API.yahoo(s).catch(e => { console.warn('Yahoo',s,e.message); return null; }))
-    ).then(results => {
-      const yahooData = {};
-      allYahooSymbols.forEach((s,i) => { if(results[i]) yahooData[s] = results[i]; });
-      yahooCache = yahooData;
-      UI.ticker(null, yahooData);
-      UI.metals(yahooData);
-      done++; status(`Loading... (${done}/${total})`);
-      return yahooData;
-    }).catch(() => { done++; return {}; });
 
-    // ── CoinGecko markets (overview + table + gainers) ──
-    const marketsTask = Promise.all([
-      API.global().catch(() => null),
-      API.markets(50).catch(() => null),
-    ]).then(([globalData, marketsData]) => {
-      if (globalData) UI.overview(globalData);
-      if (marketsData) {
-        marketsCache = marketsData;
-        UI.table(marketsData);
-        UI.gainersLosers(marketsData);
-      }
-      // Re-render ticker with BTC price now available
-      const btc = marketsData?.find(c => c.id === 'bitcoin');
-      if (btc) UI.ticker(btc, yahooCache);
-      done++; status(`Loading... (${done}/${total})`);
-      return { globalData, marketsData };
-    }).catch(() => { done++; return {}; });
+    const results = await Promise.all(
+      allSymbols.map(s => API.yahoo(s).catch(e => { console.warn('Yahoo',s,e.message); return null; }))
+    );
 
-    // ── CoinGecko ratio charts (slowest, render last) ──
-    const chartsTask = Promise.all([
-      API.chart('bitcoin', 30).catch(() => null),
-      API.chart('pax-gold', 30).catch(() => null),
-    ]).then(([btcChart, goldChart]) => {
-      if (btcChart || goldChart) renderRatioCharts(btcChart, goldChart);
-      done++; status(`Loading... (${done}/${total})`);
-      return { btcChart, goldChart };
-    }).catch(() => { done++; });
+    // Build lookup
+    const yahooData = {};
+    allSymbols.forEach((s,i) => { if(results[i]) yahooData[s] = results[i]; });
+    yahooCache = yahooData;
 
-    // Wait for all groups, then finalize
-    const [yahooData, mkt, charts] = await Promise.all([yahooTask, marketsTask, chartsTask]);
+    // Ticker
+    UI.ticker(yahooData);
 
-    // Compute ratios
-    const btc = marketsCache.find(c => c.id === 'bitcoin');
-    const btcPrice = btc?.current_price || 0;
-    const goldYahoo = yahooData['GC%3DF'];
-    const goldPrice = goldYahoo?.price || 0;
-    if (goldPrice > 0) document.getElementById('ratio-btc-gold').textContent = (btcPrice/goldPrice).toFixed(2);
-    if (btcPrice > 0) document.getElementById('ratio-btc-m2').textContent = (btcPrice / (Config.M2/1e9)).toFixed(4);
+    // Metals
+    UI.metals(yahooData);
+
+    // Crypto table
+    const coins = Config.CRYPTO_LIST.map((c, i) => {
+      const d = yahooData[c.symbol];
+      return {
+        rank: i + 1,
+        name: c.name,
+        short: c.short,
+        yahooSymbol: c.symbol,
+        price: d?.price,
+        change: d?.change,
+        volume: d?.volume,
+      };
+    }).filter(c => c.price != null);
+
+    coinsCache = coins;
+    UI.table(coins);
+    UI.gainersLosers(coins);
 
     status('live');
-  }
-
-  function renderRatioCharts(btcChart, goldChart) {
-    try {
-      // BTC/Gold ratio
-      if (btcChart?.prices && goldChart?.prices) {
-        const ratio = btcChart.prices.map((bp, i) => {
-          const gp = goldChart.prices[Math.min(i, goldChart.prices.length-1)];
-          return { time: Math.floor(bp[0]/1000), value: gp[1] > 0 ? bp[1]/gp[1] : 0 };
-        });
-        const seen = new Set();
-        Charts.createMini('ratio-btc-gold-chart', ratio.filter(d => { if(seen.has(d.time)) return false; seen.add(d.time); return true; }));
-      }
-
-      // BTC/M2
-      if (btcChart?.prices) {
-        const m2r = btcChart.prices.map(bp => ({
-          time: Math.floor(bp[0]/1000),
-          value: bp[1] / (Config.M2/1e9)
-        }));
-        const seen = new Set();
-        Charts.createMini('ratio-btc-m2-chart', m2r.filter(d => { if(seen.has(d.time)) return false; seen.add(d.time); return true; }));
-      }
-    } catch(e) { console.warn('Ratio charts failed:', e); }
   }
 
   async function init() {
