@@ -1014,54 +1014,65 @@ const App = (() => {
 
   async function refresh() {
     status('Updating...');
-    try {
-      // Fetch Yahoo data for ticker + metals (all symbols)
-      const allYahooSymbols = [...new Set([
-        ...Config.TICKER_ITEMS.map(t=>t.symbol),
-        ...Config.METALS_LIST.map(m=>m.symbol),
-      ])];
-      const yahooPromises = allYahooSymbols.map(s => API.yahoo(s).catch(e => { console.warn('Yahoo',s,e.message); return null; }));
+    let done = 0, total = 3; // yahoo, coingecko-markets, coingecko-charts
 
-      const [globalData, marketsData, btcChart, goldChart, ...yahooResults] = await Promise.all([
-        API.global().catch(() => null),
-        API.markets(50).catch(() => null),
-        API.chart('bitcoin', 30).catch(() => null),
-        API.chart('pax-gold', 30).catch(() => null),
-        ...yahooPromises,
-      ]);
-
-      // Build Yahoo lookup
+    // ── Yahoo (ticker + metals) — fires first, renders immediately ──
+    const allYahooSymbols = [...new Set([
+      ...Config.TICKER_ITEMS.map(t=>t.symbol),
+      ...Config.METALS_LIST.map(m=>m.symbol),
+    ])];
+    const yahooTask = Promise.all(
+      allYahooSymbols.map(s => API.yahoo(s).catch(e => { console.warn('Yahoo',s,e.message); return null; }))
+    ).then(results => {
       const yahooData = {};
-      allYahooSymbols.forEach((s,i) => { if(yahooResults[i]) yahooData[s] = yahooResults[i]; });
+      allYahooSymbols.forEach((s,i) => { if(results[i]) yahooData[s] = results[i]; });
       yahooCache = yahooData;
+      UI.ticker(null, yahooData);
+      UI.metals(yahooData);
+      done++; status(`Loading... (${done}/${total})`);
+      return yahooData;
+    }).catch(() => { done++; return {}; });
 
+    // ── CoinGecko markets (overview + table + gainers) ──
+    const marketsTask = Promise.all([
+      API.global().catch(() => null),
+      API.markets(50).catch(() => null),
+    ]).then(([globalData, marketsData]) => {
       if (globalData) UI.overview(globalData);
       if (marketsData) {
         marketsCache = marketsData;
         UI.table(marketsData);
         UI.gainersLosers(marketsData);
       }
-      UI.metals(yahooData);
-
-      // Ticker
+      // Re-render ticker with BTC price now available
       const btc = marketsData?.find(c => c.id === 'bitcoin');
-      UI.ticker(btc, yahooData);
+      if (btc) UI.ticker(btc, yahooCache);
+      done++; status(`Loading... (${done}/${total})`);
+      return { globalData, marketsData };
+    }).catch(() => { done++; return {}; });
 
-      // Ratios
-      const btcPrice = btc?.current_price || 0;
-      const goldYahoo = yahooData['GC%3DF'];
-      const goldPrice = goldYahoo?.price || 0;
-      if (goldPrice > 0) document.getElementById('ratio-btc-gold').textContent = (btcPrice/goldPrice).toFixed(2);
-      if (btcPrice > 0) document.getElementById('ratio-btc-m2').textContent = (btcPrice / (Config.M2/1e9)).toFixed(4);
-
-      // Ratio charts (inline, not background)
+    // ── CoinGecko ratio charts (slowest, render last) ──
+    const chartsTask = Promise.all([
+      API.chart('bitcoin', 30).catch(() => null),
+      API.chart('pax-gold', 30).catch(() => null),
+    ]).then(([btcChart, goldChart]) => {
       if (btcChart || goldChart) renderRatioCharts(btcChart, goldChart);
+      done++; status(`Loading... (${done}/${total})`);
+      return { btcChart, goldChart };
+    }).catch(() => { done++; });
 
-      status('live');
-    } catch(err) {
-      console.error(err);
-      status('Error: ' + err.message);
-    }
+    // Wait for all groups, then finalize
+    const [yahooData, mkt, charts] = await Promise.all([yahooTask, marketsTask, chartsTask]);
+
+    // Compute ratios
+    const btc = marketsCache.find(c => c.id === 'bitcoin');
+    const btcPrice = btc?.current_price || 0;
+    const goldYahoo = yahooData['GC%3DF'];
+    const goldPrice = goldYahoo?.price || 0;
+    if (goldPrice > 0) document.getElementById('ratio-btc-gold').textContent = (btcPrice/goldPrice).toFixed(2);
+    if (btcPrice > 0) document.getElementById('ratio-btc-m2').textContent = (btcPrice / (Config.M2/1e9)).toFixed(4);
+
+    status('live');
   }
 
   function renderRatioCharts(btcChart, goldChart) {
