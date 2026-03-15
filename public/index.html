@@ -4,21 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Market Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="/bull.svg">
+<meta property="og:title" content="Market Dashboard">
+<meta property="og:description" content="Live crypto, stocks & metals dashboard with interactive charts">
+<meta property="og:image" content="/bull.svg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0a1410">
 <style>
 :root {
-  --bg: #0f1117;
-  --card: #161b22;
-  --card-hover: #1c2333;
-  --border: #30363d;
-  --border-hover: #484f58;
-  --text: #e6edf3;
-  --text2: #8b949e;
-  --text3: #484f58;
-  --gain: #3fb950;
-  --gain-bg: rgba(63,185,80,0.12);
-  --loss: #f85149;
-  --loss-bg: rgba(248,81,73,0.12);
-  --accent: #58a6ff;
+  --bg: #0a1410;
+  --card: #0f1f18;
+  --card-hover: #162b20;
+  --border: #1e3a2a;
+  --border-hover: #2d5a3a;
+  --text: #d4e8d9;
+  --text2: #7a9e85;
+  --text3: #3a5e45;
+  --gain: #4ade80;
+  --gain-bg: rgba(74,222,128,0.12);
+  --loss: #f87171;
+  --loss-bg: rgba(248,113,113,0.12);
+  --accent: #5cb87a;
   --gap: 16px;
   --radius: 12px;
 }
@@ -128,7 +134,7 @@ a { color: var(--accent); text-decoration: none; }
 }
 .metals-icon {
   width: 40px; height: 40px; border-radius: 50%;
-  background: linear-gradient(135deg, #ffd700, #b8860b);
+  background: linear-gradient(135deg, #5cb87a, #2d5a3a);
   display: flex; align-items: center; justify-content: center;
   font-weight: 800; font-size: 0.85rem; color: #000;
 }
@@ -464,10 +470,10 @@ const API = (() => {
 // ═══════════════════════════════════════════════════
 const Charts = (() => {
   const THEME = {
-    layout: { background:{type:'solid',color:'#161b22'}, textColor:'#8b949e' },
-    grid: { vertLines:{color:'#30363d'}, horzLines:{color:'#30363d'} },
-    timeScale: { borderColor:'#30363d', timeVisible:true },
-    rightPriceScale: { borderColor:'#30363d' },
+    layout: { background:{type:'solid',color:'#0f1f18'}, textColor:'#7a9e85' },
+    grid: { vertLines:{color:'#1e3a2a'}, horzLines:{color:'#1e3a2a'} },
+    timeScale: { borderColor:'#1e3a2a', timeVisible:true },
+    rightPriceScale: { borderColor:'#1e3a2a' },
     crosshair: { mode: 0 },
   };
 
@@ -541,10 +547,10 @@ const FullScreenChart = (() => {
 
       container.innerHTML = '';
       chart = LightweightCharts.createChart(container, {
-        layout: { background:{type:'solid',color:'#0f1117'}, textColor:'#8b949e' },
-        grid: { vertLines:{color:'#1c2333'}, horzLines:{color:'#1c2333'} },
-        timeScale: { borderColor:'#30363d', timeVisible:true, secondsVisible:false },
-        rightPriceScale: { borderColor:'#30363d', scaleMargins:{top:0.1,bottom:0.2} },
+        layout: { background:{type:'solid',color:'#0a1410'}, textColor:'#7a9e85' },
+        grid: { vertLines:{color:'#162b20'}, horzLines:{color:'#162b20'} },
+        timeScale: { borderColor:'#1e3a2a', timeVisible:true, secondsVisible:false },
+        rightPriceScale: { borderColor:'#1e3a2a', scaleMargins:{top:0.1,bottom:0.2} },
         crosshair: { mode: 0 },
         width: container.clientWidth,
         height: container.clientHeight || (window.innerHeight - 120),
@@ -552,9 +558,9 @@ const FullScreenChart = (() => {
 
       if (currentType === 'candlestick') {
         mainSeries = chart.addCandlestickSeries({
-          upColor:'#3fb950', downColor:'#f85149',
-          borderUpColor:'#3fb950', borderDownColor:'#f85149',
-          wickUpColor:'#3fb950', wickDownColor:'#f85149',
+          upColor:'#4ade80', downColor:'#f87171',
+          borderUpColor:'#4ade80', borderDownColor:'#f87171',
+          wickUpColor:'#4ade80', wickDownColor:'#f87171',
         });
         mainSeries.setData(data.map(d => ({
           time: d.time, open: d.open, high: d.high, low: d.low, close: d.close
@@ -570,8 +576,8 @@ const FullScreenChart = (() => {
         }
       } else {
         mainSeries = chart.addAreaSeries({
-          lineColor:'#58a6ff', topColor:'rgba(88,166,255,0.3)',
-          bottomColor:'rgba(88,166,255,0.02)', lineWidth:2,
+          lineColor:'#5cb87a', topColor:'rgba(92,184,122,0.3)',
+          bottomColor:'rgba(92,184,122,0.02)', lineWidth:2,
         });
         mainSeries.setData(data.map(d => ({ time: d.time, value: d.close })));
       }
@@ -583,7 +589,7 @@ const FullScreenChart = (() => {
         chart.priceScale('vol').applyOptions({scaleMargins:{top:0.8,bottom:0}});
         volSeries.setData(data.map(d => ({
           time: d.time, value: d.volume,
-          color: d.close >= d.open ? 'rgba(63,185,80,0.3)' : 'rgba(248,81,73,0.3)',
+          color: d.close >= d.open ? 'rgba(74,222,128,0.3)' : 'rgba(248,113,113,0.3)',
         })));
       }
 

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bronze" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a7c59"/>
+      <stop offset="40%" style="stop-color:#2d5a3a"/>
+      <stop offset="70%" style="stop-color:#1a3d25"/>
+      <stop offset="100%" style="stop-color:#3d7a4f"/>
+    </linearGradient>
+    <linearGradient id="highlight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5a9c6a"/>
+      <stop offset="100%" style="stop-color:#2d5a3a"/>
+    </linearGradient>
+  </defs>
+  <!-- Body -->
+  <ellipse cx="32" cy="38" rx="18" ry="12" fill="url(#bronze)" stroke="#1a3d25" stroke-width="0.5"/>
+  <!-- Head -->
+  <ellipse cx="16" cy="30" rx="9" ry="8" fill="url(#bronze)" stroke="#1a3d25" stroke-width="0.5"/>
+  <!-- Left horn -->
+  <path d="M10 24 Q6 14 3 8" fill="none" stroke="url(#highlight)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Right horn -->
+  <path d="M18 23 Q20 14 24 9" fill="none" stroke="url(#highlight)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Neck -->
+  <ellipse cx="22" cy="33" rx="7" ry="9" fill="url(#bronze)"/>
+  <!-- Hump -->
+  <ellipse cx="28" cy="28" rx="8" ry="6" fill="url(#bronze)" stroke="#1a3d25" stroke-width="0.3"/>
+  <!-- Front left leg -->
+  <rect x="20" y="46" width="4" height="14" rx="2" fill="url(#bronze)" stroke="#1a3d25" stroke-width="0.3"/>
+  <!-- Front right leg -->
+  <rect x="26" y="46" width="4" height="14" rx="2" fill="url(#bronze)" stroke="#1a3d25" stroke-width="0.3"/>
+  <!-- Back left leg -->
+  <rect x="38" y="46" width="4" height="14" rx="2" fill="url(#bronze)" stroke="#1a3d25" stroke-width="0.3"/>
+  <!-- Back right leg -->
+  <rect x="44" y="46" width="4" height="14" rx="2" fill="url(#bronze)" stroke="#1a3d25" stroke-width="0.3"/>
+  <!-- Tail -->
+  <path d="M50 34 Q56 30 58 24 Q59 22 57 23" fill="none" stroke="url(#highlight)" stroke-width="2" stroke-linecap="round"/>
+  <!-- Eye -->
+  <circle cx="12" cy="28" r="1.5" fill="#c8e6c9"/>
+  <!-- Nostril -->
+  <circle cx="9" cy="33" r="1" fill="#1a3d25"/>
+  <!-- Ear -->
+  <ellipse cx="14" cy="22" rx="2.5" ry="3.5" fill="url(#highlight)" transform="rotate(-15 14 22)"/>
+</svg>
