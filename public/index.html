@@ -244,34 +244,113 @@ a { color: var(--accent); text-decoration: none; }
 #fs-chart-container { flex: 1; width: 100%; min-height: 0; }
 
 /* ── TRAP BUTTON ── */
-.swap-and-trap { display: flex; gap: var(--gap); align-items: flex-start; }
+.swap-and-trap { display: flex; gap: var(--gap); align-items: stretch; }
 .swap-and-trap > :first-child { flex: 1; min-width: 0; }
+.trap-wrap {
+  flex-shrink: 0; width: 420px;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
 .trap-btn {
-  flex-shrink: 0; width: 280px;
-  padding: 40px 24px;
-  background: linear-gradient(135deg, #1a0000 0%, #330000 40%, #1a0000 100%);
-  border: 3px solid #f85149;
-  border-radius: var(--radius);
+  width: 100%; min-height: 280px;
+  padding: 50px 30px;
+  background: linear-gradient(135deg, #1a0000 0%, #440000 30%, #220000 60%, #1a0000 100%);
+  border: 5px solid #ff2222;
+  border-radius: 20px;
   cursor: pointer;
-  font-family: inherit; font-size: 2rem; font-weight: 900;
+  font-family: inherit; font-size: 3.2rem; font-weight: 900;
   color: #ff2222;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  text-shadow: 0 0 20px rgba(255,34,34,0.6), 0 0 40px rgba(255,34,34,0.3);
-  box-shadow: 0 0 30px rgba(255,34,34,0.2), inset 0 0 30px rgba(255,34,34,0.05);
-  animation: trapPulse 1.5s ease-in-out infinite;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 20px rgba(255,34,34,0.8), 0 0 40px rgba(255,34,34,0.5), 0 0 80px rgba(255,34,34,0.3);
+  box-shadow: 0 0 40px rgba(255,34,34,0.3), 0 0 80px rgba(255,34,34,0.15), inset 0 0 40px rgba(255,34,34,0.08);
+  animation: trapPulse 1.5s ease-in-out infinite, trapBorder 2s ease-in-out infinite;
   transition: transform 0.2s, box-shadow 0.2s;
   line-height: 1.2; text-align: center;
+  position: relative; z-index: 2;
 }
 .trap-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 50px rgba(255,34,34,0.4), inset 0 0 30px rgba(255,34,34,0.1);
+  transform: scale(1.08);
+  box-shadow: 0 0 60px rgba(255,34,34,0.5), 0 0 120px rgba(255,34,34,0.3), inset 0 0 40px rgba(255,34,34,0.15);
   border-color: #ff4444;
+  animation: trapPulse 0.4s ease-in-out infinite, trapBorder 0.5s ease-in-out infinite;
 }
-.trap-btn:active { transform: scale(0.97); }
+.trap-btn:active { transform: scale(0.95); }
 @keyframes trapPulse {
-  0%,100% { text-shadow: 0 0 20px rgba(255,34,34,0.6), 0 0 40px rgba(255,34,34,0.3); }
-  50% { text-shadow: 0 0 30px rgba(255,34,34,0.9), 0 0 60px rgba(255,34,34,0.5), 0 0 80px rgba(255,34,34,0.2); }
+  0%,100% { text-shadow: 0 0 20px rgba(255,34,34,0.8), 0 0 40px rgba(255,34,34,0.5); }
+  50% { text-shadow: 0 0 40px rgba(255,0,0,1), 0 0 80px rgba(255,34,34,0.7), 0 0 120px rgba(255,34,34,0.3); color: #ff4444; }
+}
+@keyframes trapBorder {
+  0%,100% { border-color: #ff2222; }
+  50% { border-color: #ff6644; }
+}
+/* flashing ring */
+.trap-wrap::before {
+  content: ''; position: absolute;
+  inset: -12px; border-radius: 26px;
+  border: 3px dashed #ff4444;
+  animation: trapRing 1s linear infinite;
+  z-index: 1; pointer-events: none;
+}
+@keyframes trapRing {
+  0% { border-color: #ff4444; opacity: 1; }
+  25% { border-color: #ffaa00; opacity: 0.8; }
+  50% { border-color: #ff2222; opacity: 0.4; }
+  75% { border-color: #ff6600; opacity: 0.9; }
+  100% { border-color: #ff4444; opacity: 1; }
+}
+/* corner flash bursts */
+.trap-wrap::after {
+  content: ''; position: absolute;
+  inset: -24px; border-radius: 32px;
+  background: radial-gradient(circle, rgba(255,34,34,0.15) 0%, transparent 70%);
+  animation: trapGlow 2s ease-in-out infinite;
+  z-index: 0; pointer-events: none;
+}
+@keyframes trapGlow {
+  0%,100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+/* cartoonish arrows */
+.trap-arrow {
+  position: absolute; z-index: 3;
+  font-size: 2.8rem;
+  color: #ffcc00;
+  filter: drop-shadow(0 0 8px rgba(255,204,0,0.6));
+  pointer-events: none;
+  font-weight: 900;
+}
+.trap-arrow-top {
+  top: -38px; left: 50%; transform: translateX(-50%);
+  animation: arrowBounceDown 0.6s ease-in-out infinite;
+}
+.trap-arrow-bottom {
+  bottom: -38px; left: 50%; transform: translateX(-50%);
+  animation: arrowBounceUp 0.6s ease-in-out infinite;
+}
+.trap-arrow-left {
+  left: -44px; top: 50%; transform: translateY(-50%);
+  animation: arrowBounceRight 0.6s ease-in-out infinite;
+}
+.trap-arrow-right {
+  right: -44px; top: 50%; transform: translateY(-50%);
+  animation: arrowBounceLeft 0.6s ease-in-out infinite;
+}
+@keyframes arrowBounceDown {
+  0%,100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(10px); }
+}
+@keyframes arrowBounceUp {
+  0%,100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-10px); }
+}
+@keyframes arrowBounceRight {
+  0%,100% { transform: translateY(-50%) translateX(0); }
+  50% { transform: translateY(-50%) translateX(10px); }
+}
+@keyframes arrowBounceLeft {
+  0%,100% { transform: translateY(-50%) translateX(0); }
+  50% { transform: translateY(-50%) translateX(-10px); }
 }
 
 /* ── NEWS FEED ── */
@@ -320,7 +399,8 @@ a { color: var(--accent); text-decoration: none; }
 @media(max-width:1024px) {
   .gl-grid { grid-template-columns: 1fr; }
   .swap-and-trap { flex-direction: column; }
-  .trap-btn { width: 100%; padding: 24px; font-size: 1.5rem; }
+  .trap-wrap { width: 100%; }
+  .trap-btn { min-height: 180px; font-size: 2.2rem; padding: 30px 20px; }
 }
 @media(max-width:768px) {
   #coins-table { min-width: 500px; }
@@ -376,7 +456,13 @@ a { color: var(--accent); text-decoration: none; }
         <div class="swap-note">Rates from Yahoo Finance. Actual swap execution requires DEX integration.</div>
       </div>
     </div>
-    <button class="trap-btn" id="trap-btn">DO NOT<br>CLICK!!!!!!</button>
+    <div class="trap-wrap">
+      <span class="trap-arrow trap-arrow-top">&#11015;</span>
+      <span class="trap-arrow trap-arrow-bottom">&#11014;</span>
+      <span class="trap-arrow trap-arrow-left">&#10145;</span>
+      <span class="trap-arrow trap-arrow-right">&#11013;</span>
+      <button class="trap-btn" id="trap-btn">DO NOT<br>CLICK!!!!!!</button>
+    </div>
   </section>
 
   <!-- TOP 20 TABLE -->
