@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Dashboard</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --card: #161b22;
+  --card-hover: #1c2333;
+  --border: #30363d;
+  --border-hover: #484f58;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #484f58;
+  --gain: #3fb950;
+  --gain-bg: rgba(63,185,80,0.12);
+  --loss: #f85149;
+  --loss-bg: rgba(248,81,73,0.12);
+  --accent: #58a6ff;
+  --gap: 16px;
+  --radius: 12px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { font-size: 14px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg); color: var(--text);
+  padding-top: 50px;
+}
+a { color: var(--accent); text-decoration: none; }
+
+/* ── TICKER BAR ── */
+#ticker-bar {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  height: 50px; background: var(--card);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden; display: flex; align-items: center;
+}
+.ticker-track {
+  display: flex; gap: 40px; align-items: center;
+  height: 100%; padding: 0 20px;
+  animation: tickerScroll 40s linear infinite;
+  width: max-content;
+}
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-item {
+  display: flex; align-items: center; gap: 10px;
+  white-space: nowrap; font-size: 0.85rem;
+}
+.ticker-name { color: var(--text2); font-weight: 600; }
+.ticker-spark { width: 60px; height: 24px; }
+.ticker-price { font-weight: 600; }
+.ticker-change { font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; }
+.ticker-market-note { font-size: 0.65rem; color: var(--text3); }
+
+/* ── DASHBOARD ── */
+.dashboard {
+  max-width: 1400px; margin: 0 auto;
+  padding: var(--gap);
+  display: flex; flex-direction: column;
+  gap: calc(var(--gap) * 1.5);
+}
+.section-title {
+  font-size: 1.1rem; font-weight: 600;
+  margin-bottom: var(--gap); color: var(--text);
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.clickable { cursor: pointer; }
+.clickable:hover { border-color: var(--border-hover); background: var(--card-hover); }
+
+/* ── OVERVIEW ── */
+.overview-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--gap); }
+.card-label { font-size: 0.75rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.card-value { font-size: 1.5rem; font-weight: 700; }
+.card-change { font-size: 0.85rem; margin-top: 4px; }
+
+/* ── RATIO ── */
+.ratio-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: var(--gap); }
+.ratio-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.ratio-label { font-size: 0.85rem; color: var(--text2); font-weight: 600; }
+.ratio-value { font-size: 1.1rem; font-weight: 700; }
+.ratio-chart-mini { height: 150px; margin-top: 8px; }
+.ratio-note { font-size: 0.7rem; color: var(--text3); margin-top: 6px; }
+
+/* ── TABLE ── */
+.table-wrapper { overflow-x: auto; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); }
+#coins-table { width: 100%; border-collapse: collapse; }
+#coins-table th {
+  position: sticky; top: 0; background: var(--card);
+  text-align: left; padding: 12px 10px;
+  font-size: 0.7rem; text-transform: uppercase;
+  color: var(--text2); letter-spacing: 0.05em;
+  cursor: pointer; user-select: none;
+  border-bottom: 1px solid var(--border);
+}
+#coins-table th:hover { color: var(--text); }
+#coins-table th .sort-arrow { margin-left: 4px; font-size: 0.6rem; }
+#coins-table td {
+  padding: 10px; border-bottom: 1px solid var(--border);
+  font-size: 0.85rem; white-space: nowrap;
+}
+#coins-table tbody tr { cursor: pointer; transition: background 0.15s; }
+#coins-table tbody tr:hover { background: var(--card-hover); }
+.coin-info { display: flex; align-items: center; gap: 8px; }
+.coin-icon { width: 24px; height: 24px; border-radius: 50%; }
+.coin-symbol { color: var(--text2); font-size: 0.75rem; margin-left: 4px; }
+.spark-7d { width: 100px; height: 32px; }
+.gain { color: var(--gain); }
+.loss { color: var(--loss); }
+
+/* ── GAINERS & LOSERS ── */
+.gl-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: var(--gap); }
+.gl-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px; cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+.gl-title { font-weight: 700; font-size: 0.95rem; }
+.gl-toggle { font-size: 0.75rem; color: var(--accent); }
+.gl-preview, .gl-list { padding: 0; }
+.gl-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 20px; border-bottom: 1px solid var(--border);
+  transition: background 0.15s; cursor: pointer;
+}
+.gl-item:hover { background: var(--card-hover); }
+.gl-item:last-child { border-bottom: none; }
+.gl-item-name { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+.gl-item-change { font-weight: 600; font-size: 0.85rem; }
+.hidden { display: none !important; }
+
+/* ── METALS ── */
+.metals-trigger {
+  display: flex; align-items: center; gap: 12px;
+  padding: 20px; cursor: pointer;
+}
+.metals-icon {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, #ffd700, #b8860b);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.85rem; color: #000;
+}
+.metals-label { font-size: 1rem; font-weight: 600; flex: 1; }
+.metals-arrow { color: var(--text2); transition: transform 0.2s; }
+.metals-arrow.open { transform: rotate(90deg); }
+.metals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: var(--gap); padding: 16px; }
+.metal-item {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.metal-item:hover { border-color: var(--border-hover); }
+.metal-name { font-size: 0.8rem; color: var(--text2); margin-bottom: 6px; }
+.metal-price { font-size: 1.1rem; font-weight: 600; }
+.metal-change { font-size: 0.8rem; margin-top: 4px; }
+
+/* ── FULL-SCREEN CHART VIEW ── */
+#chart-view {
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--bg); display: flex; flex-direction: column;
+}
+.chart-topbar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 20px; border-bottom: 1px solid var(--border);
+  background: var(--card); flex-shrink: 0;
+}
+.chart-back-btn {
+  background: none; border: 1px solid var(--border); color: var(--text);
+  padding: 6px 14px; border-radius: 6px; cursor: pointer;
+  font-size: 0.85rem; transition: all 0.15s;
+}
+.chart-back-btn:hover { background: var(--card-hover); border-color: var(--border-hover); }
+.chart-asset-info { display: flex; align-items: baseline; gap: 6px; }
+.chart-asset-name { font-size: 1.2rem; font-weight: 700; }
+.chart-asset-symbol { font-size: 0.85rem; color: var(--text2); }
+.chart-price-info { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.chart-asset-price { font-size: 1.1rem; font-weight: 600; }
+.chart-asset-change { font-size: 0.85rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.chart-controls {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  padding: 10px 20px; border-bottom: 1px solid var(--border);
+  background: var(--card); flex-shrink: 0;
+}
+.btn-group { display: flex; gap: 0; }
+.toggle-btn, .range-btn {
+  background: var(--bg); border: 1px solid var(--border);
+  color: var(--text2); padding: 6px 12px;
+  font-size: 0.75rem; cursor: pointer; transition: all 0.15s;
+}
+.toggle-btn:first-child, .range-btn:first-child { border-radius: 6px 0 0 6px; }
+.toggle-btn:last-child, .range-btn:last-child { border-radius: 0 6px 6px 0; }
+.toggle-btn + .toggle-btn, .range-btn + .range-btn { border-left: none; }
+.toggle-btn.active, .range-btn.active {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+.overlay-toggles { display: flex; gap: 14px; margin-left: auto; }
+.overlay-toggles label {
+  font-size: 0.75rem; color: var(--text2);
+  display: flex; align-items: center; gap: 4px; cursor: pointer;
+}
+#fs-chart-container { flex: 1; width: 100%; min-height: 0; }
+
+/* ── STATUS BAR ── */
+#status-bar {
+  text-align: center; padding: 12px;
+  font-size: 0.75rem; color: var(--text3);
+}
+.dot, .dot-error, .dot-loading {
+  display: inline-block; width: 7px; height: 7px;
+  border-radius: 50%; margin-right: 6px; vertical-align: middle;
+}
+.dot { background: var(--gain); animation: pulse 2s infinite; }
+.dot-error { background: var(--loss); }
+.dot-loading { background: #e3b341; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+/* ── LOADING ── */
+.loading-text { color: var(--text3); font-size: 0.85rem; padding: 40px; text-align: center; }
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, var(--card-hover) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px) {
+  .ratio-grid, .gl-grid { grid-template-columns: 1fr; }
+}
+@media(max-width:768px) {
+  .overview-grid { grid-template-columns: 1fr; }
+  #coins-table { min-width: 800px; }
+  .chart-topbar { flex-wrap: wrap; gap: 10px; padding: 10px 12px; }
+  .chart-controls { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+}
+</style>
+</head>
+<body>
+
+<div id="dashboard-view">
+
+<!-- TICKER BAR -->
+<div id="ticker-bar">
+  <div class="ticker-track" id="ticker-track"></div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard">
+
+  <!-- OVERVIEW CARDS -->
+  <section>
+    <div class="overview-grid">
+      <div class="card" id="card-btc-dom">
+        <div class="card-label">Bitcoin Dominance</div>
+        <div class="card-value">--</div>
+        <div class="card-change">--</div>
+      </div>
+      <div class="card" id="card-total-mcap">
+        <div class="card-label">Total Market Cap</div>
+        <div class="card-value">--</div>
+        <div class="card-change">--</div>
+      </div>
+      <div class="card" id="card-total3">
+        <div class="card-label">Total 3 (excl BTC &amp; ETH)</div>
+        <div class="card-value">--</div>
+        <div class="card-change">--</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RATIO CHARTS -->
+  <section>
+    <h2 class="section-title">Ratio Charts</h2>
+    <div class="ratio-grid">
+      <div class="card clickable" data-ratio="btc-gold">
+        <div class="ratio-header">
+          <span class="ratio-label">BTC / Gold</span>
+          <span class="ratio-value" id="ratio-btc-gold">--</span>
+        </div>
+        <div class="ratio-chart-mini" id="ratio-btc-gold-chart"></div>
+      </div>
+      <div class="card clickable" data-ratio="btc-m2">
+        <div class="ratio-header">
+          <span class="ratio-label">BTC / M2 Money Supply</span>
+          <span class="ratio-value" id="ratio-btc-m2">--</span>
+        </div>
+        <div class="ratio-chart-mini" id="ratio-btc-m2-chart"></div>
+        <div class="ratio-note">M2 ~$21.7T (updated monthly via FRED)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOP 50 TABLE -->
+  <section>
+    <h2 class="section-title">Top 50 Cryptocurrencies</h2>
+    <div class="table-wrapper">
+      <table id="coins-table">
+        <thead>
+          <tr>
+            <th data-sort="market_cap_rank"># <span class="sort-arrow"></span></th>
+            <th data-sort="name">Name <span class="sort-arrow"></span></th>
+            <th data-sort="current_price">Price <span class="sort-arrow"></span></th>
+            <th data-sort="price_change_percentage_24h_in_currency">24h % <span class="sort-arrow"></span></th>
+            <th data-sort="price_change_percentage_7d_in_currency">7d % <span class="sort-arrow"></span></th>
+            <th data-sort="market_cap">Market Cap <span class="sort-arrow"></span></th>
+            <th data-sort="total_volume">Volume (24h) <span class="sort-arrow"></span></th>
+            <th>7d Chart</th>
+          </tr>
+        </thead>
+        <tbody id="coins-tbody">
+          <tr><td colspan="8" class="loading-text">Loading market data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- GAINERS & LOSERS -->
+  <section>
+    <h2 class="section-title">Gainers &amp; Losers (24h)</h2>
+    <div class="gl-grid">
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="gl-header" data-target="gainers-list">
+          <span class="gl-title gain">Top Gainers</span>
+          <span class="gl-toggle">Show more</span>
+        </div>
+        <div id="gainer-preview"></div>
+        <div class="hidden" id="gainers-list"></div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="gl-header" data-target="losers-list">
+          <span class="gl-title loss">Top Losers</span>
+          <span class="gl-toggle">Show more</span>
+        </div>
+        <div id="loser-preview"></div>
+        <div class="hidden" id="losers-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- METALS -->
+  <section>
+    <h2 class="section-title">Other Assets</h2>
+    <div class="card" style="padding:0;overflow:hidden;" id="metals-card">
+      <div class="metals-trigger" id="metals-trigger">
+        <div class="metals-icon">Au</div>
+        <span class="metals-label">Metals</span>
+        <span class="metals-arrow" id="metals-arrow">&#9654;</span>
+      </div>
+      <div class="hidden" id="metals-panel">
+        <div class="metals-grid" id="metals-grid"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- STATUS BAR -->
+<div id="status-bar">
+  <span class="dot-loading"></span> Connecting...
+</div>
+
+</div><!-- /dashboard-view -->
+
+<!-- FULL-SCREEN CHART VIEW -->
+<div id="chart-view" class="hidden">
+  <div class="chart-topbar">
+    <button id="chart-back" class="chart-back-btn">&larr; Back</button>
+    <div class="chart-asset-info">
+      <span id="chart-asset-name" class="chart-asset-name">Asset</span>
+      <span id="chart-asset-symbol" class="chart-asset-symbol"></span>
+    </div>
+    <div class="chart-price-info">
+      <span id="chart-asset-price" class="chart-asset-price">--</span>
+      <span id="chart-asset-change" class="chart-asset-change">--</span>
+    </div>
+  </div>
+  <div class="chart-controls">
+    <div class="btn-group">
+      <button class="toggle-btn active" data-chart-type="candlestick">Candlestick</button>
+      <button class="toggle-btn" data-chart-type="line">Line</button>
+    </div>
+    <div class="btn-group">
+      <button class="range-btn" data-range="1d">1D</button>
+      <button class="range-btn" data-range="5d">1W</button>
+      <button class="range-btn active" data-range="1mo">1M</button>
+      <button class="range-btn" data-range="3mo">3M</button>
+      <button class="range-btn" data-range="1y">1Y</button>
+    </div>
+    <div class="overlay-toggles">
+      <label><input type="checkbox" id="fs-ma50"> 50 MA</label>
+      <label><input type="checkbox" id="fs-ma200"> 200 MA</label>
+      <label><input type="checkbox" id="fs-vol" checked> Volume</label>
+    </div>
+  </div>
+  <div id="fs-chart-container"></div>
+</div>
+
+<script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+// ═══════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════
+const Config = (() => {
+  const BASE = 'https://api.coingecko.com/api/v3';
+  const YAHOO = 'https://query1.finance.yahoo.com/v8/finance/chart';
+  const REFRESH = 60000;
+  const M2 = 21.7e12;
+
+  // Yahoo Finance symbols for ticker & metals
+  const TICKER_ITEMS = [
+    { symbol:'%5EGSPC', label:'SPX', name:'S&P 500' },
+    { symbol:'%5EIXIC', label:'NDX', name:'NASDAQ' },
+    { symbol:'GC%3DF', label:'GOLD', name:'Gold' },
+  ];
+  const METALS_LIST = [
+    { symbol:'GC%3DF', name:'Gold Futures', unit:'/oz' },
+    { symbol:'SI%3DF', name:'Silver Futures', unit:'/oz' },
+    { symbol:'PL%3DF', name:'Platinum Futures', unit:'/oz' },
+    { symbol:'PA%3DF', name:'Palladium Futures', unit:'/oz' },
+    { symbol:'HG%3DF', name:'Copper Futures', unit:'/lb' },
+  ];
+
+  function fmtUSD(n, dec) {
+    if (n == null) return '--';
+    if (dec === undefined) dec = n >= 1 ? 2 : n >= 0.01 ? 4 : 6;
+    return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:dec,maximumFractionDigits:dec}).format(n);
+  }
+  function fmtLarge(n) {
+    if (n == null) return '--';
+    if (n >= 1e12) return '$'+(n/1e12).toFixed(2)+'T';
+    if (n >= 1e9) return '$'+(n/1e9).toFixed(2)+'B';
+    if (n >= 1e6) return '$'+(n/1e6).toFixed(2)+'M';
+    return '$'+n.toLocaleString();
+  }
+  function fmtPct(n) {
+    if (n == null) return '--';
+    return (n>=0?'+':'')+n.toFixed(2)+'%';
+  }
+  function cls(n) { return n >= 0 ? 'gain' : 'loss'; }
+
+  return { BASE, YAHOO, REFRESH, M2, TICKER_ITEMS, METALS_LIST, fmtUSD, fmtLarge, fmtPct, cls };
+})();
+
+// ═══════════════════════════════════════════════════
+// API SERVICE
+// ═══════════════════════════════════════════════════
+const API = (() => {
+  const cache = new Map();
+  const TTL = 55000;
+  let lastCall = 0;
+
+  async function get(url) {
+    const c = cache.get(url);
+    if (c && Date.now()-c.t < TTL) return c.d;
+    const wait = Math.max(0, 1500-(Date.now()-lastCall));
+    if (wait) await new Promise(r=>setTimeout(r,wait));
+    lastCall = Date.now();
+    const res = await fetch(url);
+    if (res.status === 429) { await new Promise(r=>setTimeout(r,30000)); return get(url); }
+    if (!res.ok) throw new Error(`${res.status}`);
+    const d = await res.json();
+    cache.set(url, {d, t:Date.now()});
+    return d;
+  }
+
+  async function yahoo(symbol) {
+    const url = `${Config.YAHOO}/${symbol}?interval=1d&range=1d`;
+    const c = cache.get(url);
+    if (c && Date.now()-c.t < TTL) return c.d;
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+    const res = await fetch(proxyUrl);
+    if (!res.ok) throw new Error(`Yahoo ${res.status}`);
+    const json = await res.json();
+    const meta = json.chart.result[0].meta;
+    const price = meta.regularMarketPrice;
+    const prev = meta.chartPreviousClose || meta.previousClose;
+    const change = prev ? ((price - prev) / prev) * 100 : 0;
+    const d = { price, prevClose: prev, change, name: meta.longName || meta.shortName || symbol };
+    cache.set(url, {d, t:Date.now()});
+    return d;
+  }
+
+  async function yahooChart(symbol, range) {
+    const INTERVALS = { '1d':'5m', '5d':'1h', '1mo':'1d', '3mo':'1d', '1y':'1d' };
+    const interval = INTERVALS[range] || '1d';
+    const url = `${Config.YAHOO}/${symbol}?range=${range}&interval=${interval}`;
+    const c = cache.get('yc:'+url);
+    if (c && Date.now()-c.t < TTL) return c.d;
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+    const res = await fetch(proxyUrl);
+    if (!res.ok) throw new Error(`Yahoo ${res.status}`);
+    const json = await res.json();
+    const result = json.chart.result[0];
+    const timestamps = result.timestamp || [];
+    const q = result.indicators.quote[0];
+    const d = timestamps.map((t, i) => ({
+      time: t,
+      open: q.open[i],
+      high: q.high[i],
+      low: q.low[i],
+      close: q.close[i],
+      volume: q.volume[i],
+    })).filter(r => r.close != null);
+    cache.set('yc:'+url, {d, t:Date.now()});
+    return d;
+  }
+
+  return {
+    global: () => get(`${Config.BASE}/global`),
+    markets: (n=50) => get(`${Config.BASE}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${n}&page=1&sparkline=true&price_change_percentage=24h%2C7d`),
+    chart: (id,days) => get(`${Config.BASE}/coins/${id}/market_chart?vs_currency=usd&days=${days}`),
+    yahoo,
+    yahooChart,
+  };
+})();
+
+// ═══════════════════════════════════════════════════
+// SPARKLINE (Canvas)
+// ═══════════════════════════════════════════════════
+const Spark = (() => {
+  function draw(canvas, data, color) {
+    if (!data || data.length < 2) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    canvas.width = w*dpr; canvas.height = h*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    const mn = Math.min(...data), mx = Math.max(...data), rng = mx-mn||1;
+    const step = w/(data.length-1);
+    ctx.clearRect(0,0,w,h);
+    ctx.beginPath();
+    ctx.strokeStyle = color || '#3fb950';
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'round';
+    for (let i=0; i<data.length; i++) {
+      const x = i*step, y = h-((data[i]-mn)/rng)*(h-4)-2;
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  return { draw };
+})();
+
+// ═══════════════════════════════════════════════════
+// CHART MANAGER (TradingView Lightweight Charts)
+// ═══════════════════════════════════════════════════
+const Charts = (() => {
+  const THEME = {
+    layout: { background:{type:'solid',color:'#161b22'}, textColor:'#8b949e' },
+    grid: { vertLines:{color:'#30363d'}, horzLines:{color:'#30363d'} },
+    timeScale: { borderColor:'#30363d', timeVisible:true },
+    rightPriceScale: { borderColor:'#30363d' },
+    crosshair: { mode: 0 },
+  };
+  const minis = {};
+
+  function createMini(elId, data) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.innerHTML = '';
+    if (minis[elId]) { minis[elId].remove(); delete minis[elId]; }
+    const chart = LightweightCharts.createChart(el, {
+      ...THEME, width: el.clientWidth, height: 150,
+      handleScroll:false, handleScale:false,
+      timeScale:{...THEME.timeScale, visible:false},
+      rightPriceScale:{visible:false},
+    });
+    const s = chart.addAreaSeries({
+      lineColor:'#58a6ff', topColor:'rgba(88,166,255,0.25)',
+      bottomColor:'rgba(88,166,255,0.02)', lineWidth:2,
+    });
+    s.setData(data);
+    chart.timeScale().fitContent();
+    minis[elId] = chart;
+    new ResizeObserver(e => chart.resize(e[0].contentRect.width, 150)).observe(el);
+  }
+
+  function calcMA(data, period) {
+    const r = [];
+    for (let i=period-1; i<data.length; i++) {
+      let sum=0;
+      for (let j=i-period+1; j<=i; j++) sum += data[j].close;
+      r.push({time:data[i].time, value:sum/period});
+    }
+    return r;
+  }
+
+  return { createMini, calcMA, THEME };
+})();
+
+// ═══════════════════════════════════════════════════
+// FULL-SCREEN CHART
+// ═══════════════════════════════════════════════════
+const FullScreenChart = (() => {
+  let chart = null, mainSeries = null, ma50s = null, ma200s = null, volSeries = null;
+  let currentSymbol = '', currentType = 'candlestick', currentRange = '1mo';
+
+  function open({ yahooSymbol, name, displaySymbol, price, change }) {
+    currentSymbol = yahooSymbol;
+    currentType = 'candlestick';
+    currentRange = '1mo';
+
+    document.getElementById('dashboard-view').classList.add('hidden');
+    document.getElementById('chart-view').classList.remove('hidden');
+
+    document.getElementById('chart-asset-name').textContent = name;
+    document.getElementById('chart-asset-symbol').textContent = displaySymbol || '';
+    document.getElementById('chart-asset-price').textContent = price != null ? Config.fmtUSD(price) : '--';
+    const chEl = document.getElementById('chart-asset-change');
+    if (change != null) {
+      chEl.textContent = Config.fmtPct(change);
+      chEl.className = 'chart-asset-change ' + Config.cls(change);
+    } else {
+      chEl.textContent = '';
+      chEl.className = 'chart-asset-change';
+    }
+
+    // Reset control states
+    document.querySelectorAll('#chart-view [data-chart-type]').forEach(b =>
+      b.classList.toggle('active', b.dataset.chartType === 'candlestick'));
+    document.querySelectorAll('#chart-view [data-range]').forEach(b =>
+      b.classList.toggle('active', b.dataset.range === '1mo'));
+
+    load();
+  }
+
+  function close() {
+    document.getElementById('chart-view').classList.add('hidden');
+    document.getElementById('dashboard-view').classList.remove('hidden');
+    destroy();
+  }
+
+  function destroy() {
+    if (chart) { chart.remove(); chart = null; }
+    mainSeries = ma50s = ma200s = volSeries = null;
+  }
+
+  async function load() {
+    const container = document.getElementById('fs-chart-container');
+    container.innerHTML = '<div class="loading-text">Loading chart...</div>';
+    destroy();
+
+    try {
+      const data = await API.yahooChart(currentSymbol, currentRange);
+      if (!data || data.length === 0) throw new Error('No data available');
+
+      container.innerHTML = '';
+      chart = LightweightCharts.createChart(container, {
+        layout: { background:{type:'solid',color:'#0f1117'}, textColor:'#8b949e' },
+        grid: { vertLines:{color:'#1c2333'}, horzLines:{color:'#1c2333'} },
+        timeScale: { borderColor:'#30363d', timeVisible:true, secondsVisible:false },
+        rightPriceScale: { borderColor:'#30363d', scaleMargins:{top:0.1,bottom:0.2} },
+        crosshair: { mode: 0 },
+        width: container.clientWidth,
+        height: container.clientHeight || (window.innerHeight - 120),
+      });
+
+      if (currentType === 'candlestick') {
+        mainSeries = chart.addCandlestickSeries({
+          upColor:'#3fb950', downColor:'#f85149',
+          borderUpColor:'#3fb950', borderDownColor:'#f85149',
+          wickUpColor:'#3fb950', wickDownColor:'#f85149',
+        });
+        mainSeries.setData(data.map(d => ({
+          time: d.time, open: d.open, high: d.high, low: d.low, close: d.close
+        })));
+
+        // 50 MA
+        if (document.getElementById('fs-ma50').checked && data.length >= 50) {
+          ma50s = chart.addLineSeries({color:'#e3b341', lineWidth:1, lastValueVisible:false, priceLineVisible:false});
+          ma50s.setData(Charts.calcMA(data, 50));
+        }
+        // 200 MA
+        if (document.getElementById('fs-ma200').checked && data.length >= 200) {
+          ma200s = chart.addLineSeries({color:'#a371f7', lineWidth:1, lastValueVisible:false, priceLineVisible:false});
+          ma200s.setData(Charts.calcMA(data, 200));
+        }
+      } else {
+        mainSeries = chart.addAreaSeries({
+          lineColor:'#58a6ff', topColor:'rgba(88,166,255,0.3)',
+          bottomColor:'rgba(88,166,255,0.02)', lineWidth:2,
+        });
+        mainSeries.setData(data.map(d => ({ time: d.time, value: d.close })));
+      }
+
+      // Volume
+      if (document.getElementById('fs-vol').checked) {
+        volSeries = chart.addHistogramSeries({
+          priceFormat:{type:'volume'}, priceScaleId:'vol',
+        });
+        chart.priceScale('vol').applyOptions({scaleMargins:{top:0.8,bottom:0}});
+        volSeries.setData(data.map(d => ({
+          time: d.time, value: d.volume,
+          color: d.close >= d.open ? 'rgba(63,185,80,0.3)' : 'rgba(248,81,73,0.3)',
+        })));
+      }
+
+      chart.timeScale().fitContent();
+      new ResizeObserver(() => {
+        if (chart) chart.resize(container.clientWidth, container.clientHeight);
+      }).observe(container);
+
+    } catch(err) {
+      container.innerHTML = `<div class="loading-text" style="color:var(--loss)">Failed to load chart: ${err.message}</div>`;
+    }
+  }
+
+  // Bind events
+  document.getElementById('chart-back').onclick = close;
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !document.getElementById('chart-view').classList.contains('hidden')) close();
+  });
+
+  document.querySelectorAll('#chart-view [data-chart-type]').forEach(btn => {
+    btn.onclick = () => {
+      currentType = btn.dataset.chartType;
+      document.querySelectorAll('#chart-view [data-chart-type]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      load();
+    };
+  });
+
+  document.querySelectorAll('#chart-view [data-range]').forEach(btn => {
+    btn.onclick = () => {
+      currentRange = btn.dataset.range;
+      document.querySelectorAll('#chart-view [data-range]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      load();
+    };
+  });
+
+  document.getElementById('fs-ma50').onchange = load;
+  document.getElementById('fs-ma200').onchange = load;
+  document.getElementById('fs-vol').onchange = load;
+
+  return { open, close };
+})();
+
+// ═══════════════════════════════════════════════════
+// UI RENDERERS
+// ═══════════════════════════════════════════════════
+const UI = (() => {
+
+  function overview(global) {
+    const d = global.data;
+    const btcDom = d.market_cap_percentage?.btc;
+    const totalMcap = d.total_market_cap?.usd;
+    const ethDom = d.market_cap_percentage?.eth || 0;
+    const total3 = totalMcap ? totalMcap * (1 - (btcDom+ethDom)/100) : null;
+    const mcapChange = d.market_cap_change_percentage_24h_usd;
+
+    setCard('card-btc-dom', btcDom != null ? btcDom.toFixed(1)+'%' : '--');
+    setCard('card-total-mcap', Config.fmtLarge(totalMcap), mcapChange);
+    setCard('card-total3', Config.fmtLarge(total3));
+  }
+
+  function setCard(id, value, change) {
+    const el = document.getElementById(id);
+    el.querySelector('.card-value').textContent = value;
+    const chEl = el.querySelector('.card-change');
+    if (change != null) {
+      chEl.textContent = Config.fmtPct(change);
+      chEl.className = 'card-change ' + Config.cls(change);
+    } else {
+      chEl.textContent = '';
+    }
+  }
+
+  let sortKey = 'market_cap_rank', sortDir = 'asc';
+  let coinsCache = [];
+
+  function table(coins) {
+    coinsCache = coins;
+    renderTableSorted();
+  }
+
+  function renderTableSorted() {
+    const coins = [...coinsCache];
+    coins.sort((a,b) => {
+      let va = a[sortKey], vb = b[sortKey];
+      if (typeof va === 'string') { va = va.toLowerCase(); vb = (vb||'').toLowerCase(); }
+      if (va == null) va = -Infinity;
+      if (vb == null) vb = -Infinity;
+      return sortDir === 'asc' ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+    });
+
+    const tbody = document.getElementById('coins-tbody');
+    tbody.innerHTML = coins.map((c,i) => {
+      const ch24 = c.price_change_percentage_24h_in_currency;
+      const ch7d = c.price_change_percentage_7d_in_currency;
+      return `<tr data-id="${c.id}" data-name="${c.name}">
+        <td>${c.market_cap_rank||'-'}</td>
+        <td><div class="coin-info">
+          <img class="coin-icon" src="${c.image}" alt="" loading="lazy">
+          ${c.name}<span class="coin-symbol">${c.symbol.toUpperCase()}</span>
+        </div></td>
+        <td>${Config.fmtUSD(c.current_price)}</td>
+        <td class="${Config.cls(ch24)}">${Config.fmtPct(ch24)}</td>
+        <td class="${Config.cls(ch7d)}">${Config.fmtPct(ch7d)}</td>
+        <td>${Config.fmtLarge(c.market_cap)}</td>
+        <td>${Config.fmtLarge(c.total_volume)}</td>
+        <td><canvas class="spark-7d" data-idx="${i}"></canvas></td>
+      </tr>`;
+    }).join('');
+
+    // Draw sparklines
+    requestAnimationFrame(() => {
+      coins.forEach((c,i) => {
+        const cv = tbody.querySelector(`canvas[data-idx="${i}"]`);
+        if (cv && c.sparkline_in_7d?.price) {
+          const p = c.sparkline_in_7d.price;
+          Spark.draw(cv, p, p[p.length-1] >= p[0] ? '#3fb950' : '#f85149');
+        }
+      });
+    });
+
+    // Update sort arrows
+    document.querySelectorAll('#coins-table th[data-sort]').forEach(th => {
+      const arrow = th.querySelector('.sort-arrow');
+      if (th.dataset.sort === sortKey) {
+        arrow.textContent = sortDir === 'asc' ? '▲' : '▼';
+      } else {
+        arrow.textContent = '';
+      }
+    });
+  }
+
+  function gainersLosers(coins) {
+    const sorted = coins.filter(c => c.price_change_percentage_24h_in_currency != null)
+      .sort((a,b) => b.price_change_percentage_24h_in_currency - a.price_change_percentage_24h_in_currency);
+    const gainers = sorted.slice(0, 20);
+    const losers = sorted.slice(-20).reverse();
+
+    renderGLList('gainer-preview', [gainers[0]]);
+    renderGLList('gainers-list', gainers.slice(1));
+    renderGLList('loser-preview', [losers[0]]);
+    renderGLList('losers-list', losers.slice(1));
+  }
+
+  function renderGLList(elId, items) {
+    const el = document.getElementById(elId);
+    if (!el || !items) return;
+    el.innerHTML = items.filter(Boolean).map(c => {
+      const ch = c.price_change_percentage_24h_in_currency;
+      return `<div class="gl-item" data-id="${c.id}" data-name="${c.name}">
+        <div class="gl-item-name">
+          <img src="${c.image}" width="20" height="20" style="border-radius:50%" loading="lazy">
+          ${c.name} <span style="color:var(--text2);font-size:0.75rem;margin-left:4px">${c.symbol.toUpperCase()}</span>
+        </div>
+        <div class="gl-item-change ${Config.cls(ch)}">${Config.fmtPct(ch)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function metals(yahooMetals) {
+    const grid = document.getElementById('metals-grid');
+    grid.innerHTML = Config.METALS_LIST.map(m => {
+      const d = yahooMetals[m.symbol];
+      const price = d?.price;
+      const change = d?.change;
+      return `<div class="metal-item" data-symbol="${m.symbol}" data-name="${m.name}">
+        <div class="metal-name">${m.name}</div>
+        <div class="metal-price">${price != null ? Config.fmtUSD(price) : 'Loading...'}</div>
+        <div class="metal-change ${change!=null?Config.cls(change):''}">${change!=null?Config.fmtPct(change):''}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function ticker(btcCoin, yahooData) {
+    const items = [];
+    // Add Yahoo-sourced items (SPX, NDX, Gold)
+    Config.TICKER_ITEMS.forEach(ti => {
+      const d = yahooData[ti.symbol];
+      items.push({ symbol: ti.label, price: d?.price, change: d?.change });
+    });
+    // Add BTC from CoinGecko
+    items.push({ symbol:'BTC', price:btcCoin?.current_price, change:btcCoin?.price_change_percentage_24h });
+
+    const html = items.map(it => {
+      const chCls = it.change != null ? Config.cls(it.change) : '';
+      return `<div class="ticker-item">
+        <span class="ticker-name">${it.symbol}</span>
+        <span class="ticker-price">${it.price != null ? Config.fmtUSD(it.price) : '--'}</span>
+        <span class="ticker-change ${chCls}">${it.change!=null?Config.fmtPct(it.change):'--'}</span>
+      </div>`;
+    }).join('');
+
+    document.getElementById('ticker-track').innerHTML = html + html; // duplicate for loop
+  }
+
+  return { overview, table, gainersLosers, metals, ticker, sortKey:()=>sortKey, sortDir:()=>sortDir,
+    setSort(k,d){ sortKey=k; sortDir=d; renderTableSorted(); }
+  };
+})();
+
+// ═══════════════════════════════════════════════════
+// EVENT BINDING
+// ═══════════════════════════════════════════════════
+(() => {
+  // Table header sorting
+  document.querySelectorAll('#coins-table th[data-sort]').forEach(th => {
+    th.onclick = () => {
+      const key = th.dataset.sort;
+      let dir = 'desc';
+      if (UI.sortKey() === key) dir = UI.sortDir() === 'asc' ? 'desc' : 'asc';
+      else if (key === 'name' || key === 'market_cap_rank') dir = 'asc';
+      UI.setSort(key, dir);
+    };
+  });
+
+  // Table row clicks
+  document.getElementById('coins-tbody').addEventListener('click', e => {
+    const row = e.target.closest('tr[data-id]');
+    if (row) {
+      const coin = App.findCoin(row.dataset.id);
+      if (coin) FullScreenChart.open({
+        yahooSymbol: coin.symbol.toUpperCase() + '-USD',
+        name: coin.name, displaySymbol: coin.symbol.toUpperCase(),
+        price: coin.current_price, change: coin.price_change_percentage_24h,
+      });
+    }
+  });
+
+  // Gainers/losers expand
+  document.querySelectorAll('.gl-header').forEach(h => {
+    h.onclick = () => {
+      const list = document.getElementById(h.dataset.target);
+      list.classList.toggle('hidden');
+      h.querySelector('.gl-toggle').textContent = list.classList.contains('hidden') ? 'Show more' : 'Show less';
+    };
+  });
+
+  // GL item clicks
+  document.querySelectorAll('#gainer-preview, #gainers-list, #loser-preview, #losers-list').forEach(el => {
+    el.addEventListener('click', e => {
+      const item = e.target.closest('.gl-item[data-id]');
+      if (item) {
+        const coin = App.findCoin(item.dataset.id);
+        if (coin) FullScreenChart.open({
+          yahooSymbol: coin.symbol.toUpperCase() + '-USD',
+          name: coin.name, displaySymbol: coin.symbol.toUpperCase(),
+          price: coin.current_price, change: coin.price_change_percentage_24h,
+        });
+      }
+    });
+  });
+
+  // Metals trigger
+  document.getElementById('metals-trigger').onclick = () => {
+    document.getElementById('metals-panel').classList.toggle('hidden');
+    document.getElementById('metals-arrow').classList.toggle('open');
+  };
+
+  // Metal item clicks
+  document.getElementById('metals-grid').addEventListener('click', e => {
+    const item = e.target.closest('.metal-item[data-symbol]');
+    if (item) {
+      const yd = App.getYahoo(item.dataset.symbol);
+      FullScreenChart.open({
+        yahooSymbol: item.dataset.symbol,
+        name: item.dataset.name,
+        displaySymbol: item.dataset.name.split(' ')[0],
+        price: yd?.price, change: yd?.change,
+      });
+    }
+  });
+
+  // Ratio card clicks
+  document.querySelectorAll('[data-ratio]').forEach(card => {
+    card.onclick = () => {
+      const btc = App.findCoin('bitcoin');
+      FullScreenChart.open({
+        yahooSymbol: 'BTC-USD',
+        name: card.dataset.ratio === 'btc-gold' ? 'BTC / Gold Ratio' : 'BTC / M2 Supply',
+        displaySymbol: 'BTC',
+        price: btc?.current_price, change: btc?.price_change_percentage_24h,
+      });
+    };
+  });
+})();
+
+// ═══════════════════════════════════════════════════
+// APP
+// ═══════════════════════════════════════════════════
+const App = (() => {
+  let marketsCache = [];
+  let yahooCache = {};
+
+  function findCoin(id) { return marketsCache.find(c => c.id === id); }
+  function getYahoo(symbol) { return yahooCache[symbol]; }
+
+  function status(msg) {
+    const bar = document.getElementById('status-bar');
+    if (msg === 'live') {
+      bar.innerHTML = `<span class="dot"></span> Live &middot; Updated ${new Date().toLocaleTimeString()} &middot; Refreshes every 60s`;
+    } else if (msg.startsWith('err')) {
+      bar.innerHTML = `<span class="dot-error"></span> ${msg}`;
+    } else {
+      bar.innerHTML = `<span class="dot-loading"></span> ${msg}`;
+    }
+  }
+
+  async function refresh() {
+    status('Updating...');
+    try {
+      // Fetch Yahoo data for ticker + metals (all symbols)
+      const allYahooSymbols = [...new Set([
+        ...Config.TICKER_ITEMS.map(t=>t.symbol),
+        ...Config.METALS_LIST.map(m=>m.symbol),
+      ])];
+      const yahooPromises = allYahooSymbols.map(s => API.yahoo(s).catch(e => { console.warn('Yahoo',s,e.message); return null; }));
+
+      const [globalData, marketsData, btcChart, goldChart, ...yahooResults] = await Promise.all([
+        API.global().catch(() => null),
+        API.markets(50).catch(() => null),
+        API.chart('bitcoin', 30).catch(() => null),
+        API.chart('pax-gold', 30).catch(() => null),
+        ...yahooPromises,
+      ]);
+
+      // Build Yahoo lookup
+      const yahooData = {};
+      allYahooSymbols.forEach((s,i) => { if(yahooResults[i]) yahooData[s] = yahooResults[i]; });
+      yahooCache = yahooData;
+
+      if (globalData) UI.overview(globalData);
+      if (marketsData) {
+        marketsCache = marketsData;
+        UI.table(marketsData);
+        UI.gainersLosers(marketsData);
+      }
+      UI.metals(yahooData);
+
+      // Ticker
+      const btc = marketsData?.find(c => c.id === 'bitcoin');
+      UI.ticker(btc, yahooData);
+
+      // Ratios
+      const btcPrice = btc?.current_price || 0;
+      const goldYahoo = yahooData['GC%3DF'];
+      const goldPrice = goldYahoo?.price || 0;
+      if (goldPrice > 0) document.getElementById('ratio-btc-gold').textContent = (btcPrice/goldPrice).toFixed(2);
+      if (btcPrice > 0) document.getElementById('ratio-btc-m2').textContent = (btcPrice / (Config.M2/1e9)).toFixed(4);
+
+      // Ratio charts (inline, not background)
+      if (btcChart || goldChart) renderRatioCharts(btcChart, goldChart);
+
+      status('live');
+    } catch(err) {
+      console.error(err);
+      status('Error: ' + err.message);
+    }
+  }
+
+  function renderRatioCharts(btcChart, goldChart) {
+    try {
+      // BTC/Gold ratio
+      if (btcChart?.prices && goldChart?.prices) {
+        const ratio = btcChart.prices.map((bp, i) => {
+          const gp = goldChart.prices[Math.min(i, goldChart.prices.length-1)];
+          return { time: Math.floor(bp[0]/1000), value: gp[1] > 0 ? bp[1]/gp[1] : 0 };
+        });
+        const seen = new Set();
+        Charts.createMini('ratio-btc-gold-chart', ratio.filter(d => { if(seen.has(d.time)) return false; seen.add(d.time); return true; }));
+      }
+
+      // BTC/M2
+      if (btcChart?.prices) {
+        const m2r = btcChart.prices.map(bp => ({
+          time: Math.floor(bp[0]/1000),
+          value: bp[1] / (Config.M2/1e9)
+        }));
+        const seen = new Set();
+        Charts.createMini('ratio-btc-m2-chart', m2r.filter(d => { if(seen.has(d.time)) return false; seen.add(d.time); return true; }));
+      }
+    } catch(e) { console.warn('Ratio charts failed:', e); }
+  }
+
+  async function init() {
+    await refresh();
+    setInterval(refresh, Config.REFRESH);
+  }
+
+  return { init, findCoin, getYahoo };
+})();
+
+document.addEventListener('DOMContentLoaded', App.init);
+</script>
+</body>
+</html>
